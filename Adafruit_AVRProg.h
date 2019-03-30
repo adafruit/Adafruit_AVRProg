@@ -14,6 +14,8 @@
 
 //#define VERBOSE 1
 
+#define FUSE_CLOCKSPEED         100000
+#define FLASH_CLOCKSPEED        1000000
 
 typedef struct image {
     char image_name[30];	       /* Ie "optiboot_diecimila.hex" */

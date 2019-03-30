@@ -44,9 +44,6 @@ bool Adafruit_AVRProg::targetPower(bool poweron) {
       pinMode(progLED, OUTPUT);
       digitalWrite(progLED, HIGH);
     }
-    pinMode(_reset, OUTPUT);
-    digitalWrite(_reset, LOW);  // reset it right away.
-    delay(100);
     Serial.print("Starting Program Mode...");
     if (startProgramMode()) {
       Serial.println(" [OK]");
@@ -67,7 +64,8 @@ bool Adafruit_AVRProg::targetPower(bool poweron) {
 
 bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
   pinMode(_reset, OUTPUT);
-  digitalWrite(_reset, LOW);
+  digitalWrite(_reset, HIGH);
+  delay(5);
 
   if (spi) {
     debug("Using hardware SPI");
@@ -77,9 +75,6 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
     debug("Using software SPI");
     pinMode(_sck, OUTPUT);
     digitalWrite(_sck, LOW);
-    delay(50);
-    digitalWrite(_reset, LOW);
-    delay(50);
     pinMode(_miso, INPUT);
     pinMode(_mosi, OUTPUT);
     float _delay = 1000.0 * 1000.0 / (float)clockspeed;
@@ -89,13 +84,16 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
     error(F("Neither hardware or software SPI modes selected"));
   }
   debug("...spi_init done");
+  digitalWrite(_reset, LOW);
 
   debug("...isp_transaction");
-  if (isp_transaction(0xAC, 0x53, 0x00, 0x00) == 0x5300) {
+  uint16_t reply = isp_transaction(0xAC, 0x53, 0x00, 0x00);
+  if (reply == 0x5300) {
     debug("...Done");
     programmode = true;
     return true;
   }
+  Serial.print(reply, HEX);
   return false;
 }
 
@@ -110,7 +108,7 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
  */
 uint16_t Adafruit_AVRProg::readSignature (void)
 {
-  startProgramMode(100000); // start at 100KHz speed
+  startProgramMode(FUSE_CLOCKSPEED);
     
   uint16_t target_type = 0;
   
@@ -125,7 +123,7 @@ uint16_t Adafruit_AVRProg::readSignature (void)
 
 // Send the erase command, then busy wait until the chip is erased
 void Adafruit_AVRProg::eraseChip(void) {
-  startProgramMode(100000); // start at 100KHz speed    
+  startProgramMode(FUSE_CLOCKSPEED);
   if (isp_transaction(0xAC, 0x80, 0, 0) != 0x8000) {	// chip erase
     error(F("Error on chip erase command"));
   }
@@ -140,7 +138,7 @@ void Adafruit_AVRProg::eraseChip(void) {
  */
 bool Adafruit_AVRProg::programFuses (const byte *fuses)
 {
-  startProgramMode(100000); // start at 100KHz speed
+  startProgramMode(FUSE_CLOCKSPEED);
     
   byte f;
   Serial.println(F("\nSetting fuses"));
@@ -186,7 +184,7 @@ bool Adafruit_AVRProg::programFuses (const byte *fuses)
  */
 boolean Adafruit_AVRProg::verifyFuses (const byte *fuses, const byte *fusemask)
 {
-  startProgramMode(100000); // start at 100KHz speed
+  startProgramMode(FUSE_CLOCKSPEED);
 
   byte f;
   Serial.println(F("Verifying fuses..."));
@@ -367,7 +365,7 @@ const byte *Adafruit_AVRProg::readImagePage (const byte *hextext, uint16_t pagea
 // Thankfully this does not have to be done by pages!
 // returns true if the image is the same as the hextext, returns false on any error
 boolean Adafruit_AVRProg::verifyImage(const byte *hextext)  {
-  startProgramMode(1000000); // start at 1MHz speed
+  startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
 
   uint16_t len;
   byte b, cksum = 0;
@@ -479,7 +477,7 @@ bool Adafruit_AVRProg::flashWord (uint8_t hilo, uint16_t addr, uint8_t data) {
 bool Adafruit_AVRProg::flashPage (byte *pagebuff, uint16_t pageaddr, uint8_t pagesize) {  
   Serial.print(F("Flashing page ")); Serial.println(pageaddr, HEX);
 
-  startProgramMode(1000000); // start at 1MHz speed
+  startProgramMode(FLASH_CLOCKSPEED);
 
   for (uint16_t i=0; i < pagesize/2; i++) {  
 #if VERBOSE
