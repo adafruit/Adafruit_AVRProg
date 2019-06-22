@@ -37,7 +37,7 @@ typedef struct alias {
 
 // Useful message printing definitions
 
-#define debug(string) // flashprint(PSTR(string));
+#define debug(string) //Serial.println(string);
 
 class Adafruit_AVRProg {
 
