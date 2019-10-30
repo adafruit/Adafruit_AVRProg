@@ -41,6 +41,9 @@ typedef struct image {
 
 #define debug(string) // Serial.println(string);
 
+/*!
+  @brief    Class for talking to an AVR chip with SPI to program flash and fuses
+*/
 class Adafruit_AVRProg {
 
 public:

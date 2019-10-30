@@ -158,7 +158,11 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
   return target_type;
 }
 
-// Send the erase command, then busy wait until the chip is erased
+/**************************************************************************/
+/*!
+    @brief    Send the erase command, then busy wait until the chip is erased
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::eraseChip(void) {
   startProgramMode(FUSE_CLOCKSPEED);
   if (isp_transaction(0xAC, 0x80, 0, 0) != 0x8000) { // chip erase
@@ -168,10 +172,16 @@ void Adafruit_AVRProg::eraseChip(void) {
   endProgramMode();
 }
 
-/*
- * programmingFuses
- * Program the fuse/lock bits
- */
+/**************************************************************************/
+/*!
+    @brief    Program the fuses on a device
+    @param    fuses Pointer to 4-byte array of fuses
+    @param    fusemask Pointer to 4-byte array of bitmasks to apply to fuses
+    that are read.
+    @return True if we were able to send data and get a response from the chip.
+    You could still run verifyFuses() afterwards!
+*/
+/**************************************************************************/
 bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   startProgramMode(FUSE_CLOCKSPEED);
 
@@ -215,10 +225,15 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   return true;
 }
 
-/*
- * verifyFuses
- * Verifies a fuse set
- */
+/**************************************************************************/
+/*!
+    @brief    Verify the fuses are set to what we expect
+    @param    fuses Pointer to 4-byte array of fuses
+    @param    fusemask Pointer to 4-byte array of bitmasks to apply to fuses
+    that are read.
+    @return True if the fuses on the device are identical to the fuses passed in
+*/
+/**************************************************************************/
 boolean Adafruit_AVRProg::verifyFuses(const byte *fuses, const byte *fusemask) {
   startProgramMode(FUSE_CLOCKSPEED);
 
@@ -265,6 +280,16 @@ boolean Adafruit_AVRProg::verifyFuses(const byte *fuses, const byte *fusemask) {
   return true;
 }
 
+/**************************************************************************/
+/*!
+    @brief    Program the chip flash
+    @param    hextext A pointer to a array of bytes in INTEL HEX format
+    @param    pagesize The flash-page size of this chip, in bytes. Check
+   datasheet!
+    @param    chipsize The flash size of this chip, in bytes. Check datasheet!
+    @return True if flashing worked out, check the data with verifyImage!
+*/
+/**************************************************************************/
 bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
                                   uint32_t chipsize) {
   uint16_t pageaddr = 0;
@@ -298,6 +323,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
  * Read a page of intel hex image from a string in pgm memory. Returns a pointer
  * to where we ended
  */
+
 const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
                                             uint16_t pageaddr, uint8_t pagesize,
                                             byte *page) {
@@ -408,10 +434,15 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
   return hextext;
 }
 
-// verifyImage does a byte-by-byte verify of the flash hex against the chip
-// Thankfully this does not have to be done by pages!
-// returns true if the image is the same as the hextext, returns false on any
-// error
+/**************************************************************************/
+/*!
+    @brief    Does a byte-by-byte verify of the flash hex against the chip
+    Thankfully this does not have to be done by pages!
+    @param    hextext A pointer to a array of bytes in INTEL HEX format
+    @return True if the image is the same as the hextext, returns false on any
+    error
+*/
+/**************************************************************************/
 boolean Adafruit_AVRProg::verifyImage(const byte *hextext) {
   startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
 
