@@ -58,14 +58,13 @@ const image_t PROGMEM image_328 = {
 :107FC000E3DF1150E9F7F2DF1F910895282E80E0DA
 :0A7FD000E7DFEE27FF270994020601
 :00000001FF
-    )"}
-};
+    )"}};
 
 /*
  * Table of defined images
  */
 const image_t *images[] = {
-  &image_328,
+    &image_328,
 };
 
-uint8_t NUMIMAGES = sizeof(images)/sizeof(images[0]);
+uint8_t NUMIMAGES = sizeof(images) / sizeof(images[0]);
