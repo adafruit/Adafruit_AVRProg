@@ -5,16 +5,16 @@ Adafruit_AVRProg avrprog = Adafruit_AVRProg();
 /*
  * Pins to target
  */
-#define AVRPROG_SCK 29
-#define AVRPROG_MISO 28
-#define AVRPROG_MOSI 30
-#define AVRPROG_RESET 27
+#define AVRPROG_SCK 13
+#define AVRPROG_MISO 12
+#define AVRPROG_MOSI 11
+#define AVRPROG_RESET 10
 
 #define LED_PROGMODE LED_BUILTIN
 #define LED_ERR LED_BUILTIN
 
 #define BUTTON AVRPROG_RESET // use the board's reset button!
-#define PIEZOPIN A3
+#define PIEZOPIN 9
 
 extern const image_t *images[];
 
