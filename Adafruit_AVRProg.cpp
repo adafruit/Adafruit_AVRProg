@@ -3,7 +3,6 @@
 
 static byte pageBuffer[128]; /* One page of flash */
 
-
 /**************************************************************************/
 /*!
     @brief  Instantiate a new programmer, no pins are defined to start
@@ -28,7 +27,6 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, SPIClass *theSPI) {
   _reset = reset_pin;
   spi = theSPI;
 }
-
 
 /**************************************************************************/
 /*!
@@ -70,7 +68,8 @@ void Adafruit_AVRProg::endProgramMode(void) {
 
 /**************************************************************************/
 /*!
-    @brief    Begin/end programming, turn on/off a programming LED if we have one
+    @brief    Begin/end programming, turn on/off a programming LED if we have
+   one
     @param    poweron Whether we are starting or ending programming
     @return True if we were able to connect to an AVR target on start. Always
     true on end programming.

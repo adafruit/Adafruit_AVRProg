@@ -14,8 +14,8 @@
 
 //#define VERBOSE 1
 
-#define FUSE_CLOCKSPEED 100000        ///< Fuses need to be programmed slowly
-#define FLASH_CLOCKSPEED 1000000      ///< Once fuse'd you can flash fast!
+#define FUSE_CLOCKSPEED 100000   ///< Fuses need to be programmed slowly
+#define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
 
 /**! Struct for holding one 'program' fuses & code */
 typedef struct image {
@@ -24,9 +24,12 @@ typedef struct image {
   uint16_t image_chipsig;  ///< Low two bytes of signature, check datasheet!
   byte image_progfuses[5]; ///< fuses to set during programming (e.g unlock)
   byte image_normfuses[5]; ///< fuses to set after programming (e.g lock)
-  byte fusemask[4];        ///< Not all bits are used in the fuses, mask the ones we do use
-  uint16_t chipsize; ///< Total size for flash programming, in bytes. check datasheet!
-  byte image_pagesize; ///< Page size for flash programming, in bytes. check datasheet!
+  byte fusemask[4]; ///< Not all bits are used in the fuses, mask the ones we do
+                    ///use
+  uint16_t chipsize;   ///< Total size for flash programming, in bytes. check
+                       ///datasheet!
+  byte image_pagesize; ///< Page size for flash programming, in bytes. check
+                       ///datasheet!
 #ifdef __SAMD21G18A__
   byte image_hexcode[50000]; ///< Max buffer for intel hex format image (text)
 #else
@@ -54,11 +57,11 @@ public:
   void setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
               int8_t miso_pin);
 
-  /*! 
+  /*!
     @brief  Set up a GPIO as a programming-indicator LED
     @param led The pin to use for the LED */
   void setProgramLED(uint8_t led) { progLED = led; }
-  /*! 
+  /*!
     @brief  Set up a GPIO as an error-indicator LED
     @param led The pin to use for the LED */
   void setErrorLED(uint8_t led) { errLED = led; }
