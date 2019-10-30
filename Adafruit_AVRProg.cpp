@@ -3,6 +3,12 @@
 
 static byte pageBuffer[128]; /* One page of flash */
 
+
+/**************************************************************************/
+/*!
+    @brief  Instantiate a new programmer, no pins are defined to start
+*/
+/**************************************************************************/
 Adafruit_AVRProg::Adafruit_AVRProg() {
   progLED = errLED = -1;
   _sck = _miso = _mosi = _reset = -1;
@@ -11,11 +17,29 @@ Adafruit_AVRProg::Adafruit_AVRProg() {
   spiBitDelay = 0;
 }
 
+/**************************************************************************/
+/*!
+    @brief  Configure a hardware SPI interface, plus one reset pin
+    @param    reset_pin The arduino pin connected to the target RESET
+    @param    theSPI an SPIClass connected to the ISP port of the AVR
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::setSPI(int8_t reset_pin, SPIClass *theSPI) {
   _reset = reset_pin;
   spi = theSPI;
 }
 
+
+/**************************************************************************/
+/*!
+    @brief  Configure a software SPI interface, plus one reset pin
+    @param    reset_pin The arduino pin connected to the target RESET
+    @param    sck_pin The arduino pin connected to the target SCK
+    @param    mosi_pin The arduino pin connected to the target MOSI
+
+    @param    miso_pin The arduino pin connected to the target MISO
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
                               int8_t miso_pin) {
   _reset = reset_pin;
@@ -24,6 +48,11 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
   _sck = sck_pin;
 }
 
+/**************************************************************************/
+/*!
+    @brief  End any SPI transactions, set reset pin to input with no pullup
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::endProgramMode(void) {
   if (spi) {
     SPI.endTransaction();
@@ -39,6 +68,14 @@ void Adafruit_AVRProg::endProgramMode(void) {
   programmode = false;
 }
 
+/**************************************************************************/
+/*!
+    @brief    Begin/end programming, turn on/off a programming LED if we have one
+    @param    poweron Whether we are starting or ending programming
+    @return True if we were able to connect to an AVR target on start. Always
+    true on end programming.
+*/
+/**************************************************************************/
 bool Adafruit_AVRProg::targetPower(bool poweron) {
   if (poweron) {
     if (progLED > 0) {
