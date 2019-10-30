@@ -7,37 +7,32 @@
 #include <avr/pgmspace.h>
 #endif
 
-#define FUSE_PROT 0 /* memory protection */
-#define FUSE_LOW 1  /* Low fuse */
-#define FUSE_HIGH 2 /* High fuse */
-#define FUSE_EXT 3  /* Extended fuse */
+#define FUSE_PROT 0 ///< memory protection
+#define FUSE_LOW 1  ///< Low fuse
+#define FUSE_HIGH 2 ///< High fuse
+#define FUSE_EXT 3  ///< Extended fuse
 
 //#define VERBOSE 1
 
-#define FUSE_CLOCKSPEED 100000
-#define FLASH_CLOCKSPEED 1000000
+#define FUSE_CLOCKSPEED 100000        ///< Fuses need to be programmed slowly
+#define FLASH_CLOCKSPEED 1000000      ///< Once fuse'd you can flash fast!
 
+/**! Struct for holding one 'program' fuses & code */
 typedef struct image {
-  char image_name[30];     /* Ie "optiboot_diecimila.hex" */
-  char image_chipname[12]; /* ie "atmega168" */
-  uint16_t image_chipsig;  /* Low two bytes of signature */
-  byte image_progfuses[5]; /* fuses to set during programming */
-  byte image_normfuses[5]; /* fuses to set after programming */
-  byte fusemask[4];
-  uint16_t chipsize;
-  byte image_pagesize; /* page size for flash programming */
+  char image_name[30];     ///< i.e. "optiboot_diecimila.hex"
+  char image_chipname[12]; ///< i.e. "atmega168"
+  uint16_t image_chipsig;  ///< Low two bytes of signature, check datasheet!
+  byte image_progfuses[5]; ///< fuses to set during programming (e.g unlock)
+  byte image_normfuses[5]; ///< fuses to set after programming (e.g lock)
+  byte fusemask[4];        ///< Not all bits are used in the fuses, mask the ones we do use
+  uint16_t chipsize; ///< Total size for flash programming, in bytes. check datasheet!
+  byte image_pagesize; ///< Page size for flash programming, in bytes. check datasheet!
 #ifdef __SAMD21G18A__
-  byte image_hexcode[50000]; /* intel hex format image (text) */
+  byte image_hexcode[50000]; ///< Max buffer for intel hex format image (text)
 #else
-  byte image_hexcode[10000]; /* intel hex format image (text) */
+  byte image_hexcode[10000]; ///< Max buffer for intel hex format image (text)
 #endif
 } image_t;
-
-typedef struct alias {
-  char image_chipname[12];
-  uint16_t image_chipsig;
-  image_t *alias_image;
-} alias_t;
 
 // Useful message printing definitions
 
