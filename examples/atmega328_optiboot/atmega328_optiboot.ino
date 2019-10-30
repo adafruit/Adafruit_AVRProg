@@ -107,7 +107,11 @@ void loop(void) {
     Serial.println("Fuses verified correctly!");
   }
 
+#if !defined(ESP32)
+  // no 'tone' on ESP32
   tone(PIEZOPIN, 4000, 200);
+#endif
+
   while (1)
     ;
 }

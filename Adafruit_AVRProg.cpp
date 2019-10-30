@@ -259,7 +259,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
  *
  * Read a page of intel hex image from a string in pgm memory. Returns a pointer
  * to where we ended
-*/
+ */
 const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
                                             uint16_t pageaddr, uint8_t pagesize,
                                             byte *page) {
