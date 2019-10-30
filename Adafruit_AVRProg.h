@@ -25,11 +25,11 @@ typedef struct image {
   byte image_progfuses[5]; ///< fuses to set during programming (e.g unlock)
   byte image_normfuses[5]; ///< fuses to set after programming (e.g lock)
   byte fusemask[4]; ///< Not all bits are used in the fuses, mask the ones we do
-                    ///use
+                    ///< use
   uint16_t chipsize;   ///< Total size for flash programming, in bytes. check
-                       ///datasheet!
+                       ///< datasheet!
   byte image_pagesize; ///< Page size for flash programming, in bytes. check
-                       ///datasheet!
+                       ///< datasheet!
 #ifdef __SAMD21G18A__
   byte image_hexcode[50000]; ///< Max buffer for intel hex format image (text)
 #else
