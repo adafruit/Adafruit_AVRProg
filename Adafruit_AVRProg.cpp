@@ -176,8 +176,6 @@ void Adafruit_AVRProg::eraseChip(void) {
 /*!
     @brief    Program the fuses on a device
     @param    fuses Pointer to 4-byte array of fuses
-    @param    fusemask Pointer to 4-byte array of bitmasks to apply to fuses
-    that are read.
     @return True if we were able to send data and get a response from the chip.
     You could still run verifyFuses() afterwards!
 */
