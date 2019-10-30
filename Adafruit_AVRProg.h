@@ -29,7 +29,7 @@ typedef struct image {
 #ifdef __SAMD21G18A__
   byte image_hexcode[50000]; /* intel hex format image (text) */
 #else
-  byte image_hexcode[19000]; /* intel hex format image (text) */
+  byte image_hexcode[10000]; /* intel hex format image (text) */
 #endif
 } image_t;
 
