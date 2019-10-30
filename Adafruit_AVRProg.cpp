@@ -138,11 +138,13 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
  * ISP high level commands
  */
 
-/*
- * readSignature
- * read the bottom two signature bytes (if possible) and return them
- * Note that the highest signature byte is the same over all AVRs so we skip it
- */
+/**************************************************************************/
+/*!
+    @brief  Read the bottom two signature bytes (if possible) and return them
+    Note that the highest signature byte is the same over all AVRs so we skip it
+    @returns The two bytes as one uint16_t
+*/
+/**************************************************************************/
 uint16_t Adafruit_AVRProg::readSignature(void) {
   startProgramMode(FUSE_CLOCKSPEED);
 
@@ -577,6 +579,13 @@ void Adafruit_AVRProg::busyWait(void) {
   } while (busybit & 0x01);
 }
 
+/**************************************************************************/
+/*!
+    @brief  If you somehow get a chip that is expecting an external clock or
+    crystal, we can generate a 8MHz square wave on ATmega328's digital 9 that
+    can be connected to the crystal input to clock it. ONLY FOR AVR 'HOSTS'!
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::generateClock() {
 #ifdef __AVR__
   Serial.println(F("Setting up 8MHz clock on pin 9"));
@@ -655,10 +664,13 @@ byte Adafruit_AVRProg::hexToByte(byte h) {
   return -1;
 }
 
-/*
- * pulse
- * turn a pin on and off a few times; indicates life via LED
- */
+/**************************************************************************/
+/*!
+    @brief  Turn a pin on and off a few times; indicates life via LED
+    @param  pin The arduino pin connected to the LED
+    @param  times how many times to blink!
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::pulseLED(int pin, int times) {
   uint8_t PTIME = 30;
   pinMode(pin, OUTPUT);
@@ -670,6 +682,12 @@ void Adafruit_AVRProg::pulseLED(int pin, int times) {
   } while (times--);
 }
 
+/**************************************************************************/
+/*!
+    @brief  Print an error, turn on the error LED and halt!
+    @param  string What to print out before halting
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::error(const char *string) {
   Serial.println(string);
   if (errLED > 0) {
@@ -680,6 +698,12 @@ void Adafruit_AVRProg::error(const char *string) {
   }
 }
 
+/**************************************************************************/
+/*!
+    @brief  Print an error, turn on the error LED and halt!
+    @param  string What to print out before halting
+*/
+/**************************************************************************/
 void Adafruit_AVRProg::error(const __FlashStringHelper *string) {
   Serial.println(string);
   if (errLED > 0) {

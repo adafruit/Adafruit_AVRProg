@@ -42,7 +42,6 @@ class Adafruit_AVRProg {
 
 public:
   Adafruit_AVRProg();
-  void begin();
 
   void pulseLED(int pin, int times);
   void eraseChip(void);
@@ -54,7 +53,14 @@ public:
   void setSPI(int8_t reset_pin, SPIClass *theSPI = &SPI);
   void setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
               int8_t miso_pin);
+
+  /*! 
+    @brief  Set up a GPIO as a programming-indicator LED
+    @param led The pin to use for the LED */
   void setProgramLED(uint8_t led) { progLED = led; }
+  /*! 
+    @brief  Set up a GPIO as an error-indicator LED
+    @param led The pin to use for the LED */
   void setErrorLED(uint8_t led) { errLED = led; }
   void generateClock(void);
 
