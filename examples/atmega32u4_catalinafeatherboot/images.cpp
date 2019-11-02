@@ -9,10 +9,10 @@ const image_t PROGMEM image_32u4_boot = {
     0x9587,
     // Programming fuses, written before writing to flash. Fuses set to
     // zero are untouched.
-    {0x3F, 0xFF, 0xD0, 0x0B},           // pre program fuses (prot/lock, low, high, ext)
+    {0x3F, 0xFF, 0xD0, 0x0B}, // pre program fuses (prot/lock, low, high, ext)
     // Normal fuses, written after writing to flash (but before
     // verifying). Fuses set to zero are untouched.
-    {0x2F, 0xFF, 0xD0, 0x0B},           // post program fuses
+    {0x2F, 0xFF, 0xD0, 0x0B}, // post program fuses
     // Fuse verify mask. Any bits set to zero in these values are
     // ignored while verifying the fuses after writing them. All (and
     // only) bits that are unused for this atmega chip should be zero
@@ -155,8 +155,7 @@ const image_t PROGMEM image_32u4_boot = {
 :207FC000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC1
 :207FE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA1
 :00000001FF
-    )"}
-};
+    )"}};
 
 /*
  * Table of defined images
