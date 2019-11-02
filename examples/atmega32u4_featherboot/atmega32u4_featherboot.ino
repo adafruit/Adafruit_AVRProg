@@ -9,7 +9,6 @@ Adafruit_AVRProg avrprog = Adafruit_AVRProg();
 #define AVRPROG_MISO 12
 #define AVRPROG_MOSI 11
 #define AVRPROG_RESET 10
-// If we have clock out enabled, it will be on pin 9
 
 #define LED_PROGMODE LED_BUILTIN
 #define LED_ERR LED_BUILTIN
@@ -34,7 +33,7 @@ void setup() {
 
   avrprog.setProgramLED(LED_PROGMODE);
   avrprog.setErrorLED(LED_ERR);
-  // avrprog.generateClock();  // on pin 9
+  // avrprog.generateClock();
   avrprog.setSPI(AVRPROG_RESET, AVRPROG_SCK, AVRPROG_MOSI, AVRPROG_MISO);
 }
 
@@ -79,9 +78,11 @@ void loop(void) {
     avrprog.error(F("Programming Fuses fail"));
   }
 
-  if (!avrprog.verifyFuses(targetimage->image_progfuses,
-                           targetimage->fusemask)) {
-    avrprog.error(F("Failed to verify fuses"));
+  // We should disconnect/reconnect after fusing
+  avrprog.targetPower(false);
+  delay(100);
+  if (!avrprog.targetPower(true)) {
+    avrprog.error("Failed to connect to target");
   }
 
   if (!avrprog.writeImage(targetimage->image_hexcode,
