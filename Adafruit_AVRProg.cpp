@@ -633,10 +633,14 @@ uint32_t Adafruit_AVRProg::isp_transaction(uint8_t a, uint8_t b, uint8_t c,
                                            uint8_t d) {
   uint8_t l, n, m, o;
 #if VERBOSE > 1
-  Serial.print("CMD ["); Serial.print(a, HEX);
-  Serial.print(" "); Serial.print(b, HEX);
-  Serial.print(" "); Serial.print(c, HEX);
-  Serial.print(" "); Serial.print(d, HEX);
+  Serial.print("CMD [");
+  Serial.print(a, HEX);
+  Serial.print(" ");
+  Serial.print(b, HEX);
+  Serial.print(" ");
+  Serial.print(c, HEX);
+  Serial.print(" ");
+  Serial.print(d, HEX);
   Serial.print("]");
 #endif
   o = transfer(a);
@@ -646,10 +650,14 @@ uint32_t Adafruit_AVRProg::isp_transaction(uint8_t a, uint8_t b, uint8_t c,
   l = transfer(d);
 
 #if VERBOSE > 1
-  Serial.print(" ["); Serial.print(o, HEX);
-  Serial.print(" "); Serial.print(n, HEX);
-  Serial.print(" "); Serial.print(m, HEX);
-  Serial.print(" "); Serial.print(l, HEX);
+  Serial.print(" [");
+  Serial.print(o, HEX);
+  Serial.print(" ");
+  Serial.print(n, HEX);
+  Serial.print(" ");
+  Serial.print(m, HEX);
+  Serial.print(" ");
+  Serial.print(l, HEX);
   Serial.print("]\n");
 #endif
 

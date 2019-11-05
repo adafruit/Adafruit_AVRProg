@@ -14,7 +14,7 @@
 
 //#define VERBOSE 2
 
-#define FUSE_CLOCKSPEED 10000   ///< Fuses need to be programmed slowly
+#define FUSE_CLOCKSPEED 10000    ///< Fuses need to be programmed slowly
 #define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
 
 /**! Struct for holding one 'program' fuses & code */
