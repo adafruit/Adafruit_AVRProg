@@ -77,7 +77,16 @@ void loop(void) {
           targetimage->image_progfuses)) { // get fuses ready to program
     avrprog.error(F("Programming Fuses fail"));
   }
+  
+  delay(50);
 
+  if (!avrprog.verifyFuses(targetimage->image_progfuses,
+                           targetimage->fusemask)) {
+    avrprog.error("Failed to verify fuses");
+  } else {
+    Serial.println("Fuses verified correctly!");
+  }
+  
   // We should disconnect/reconnect after fusing
   avrprog.targetPower(false);
   delay(100);

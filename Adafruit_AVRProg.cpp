@@ -629,14 +629,31 @@ void Adafruit_AVRProg::generateClock() {
 #endif
 }
 
-uint16_t Adafruit_AVRProg::isp_transaction(uint8_t a, uint8_t b, uint8_t c,
+uint32_t Adafruit_AVRProg::isp_transaction(uint8_t a, uint8_t b, uint8_t c,
                                            uint8_t d) {
-  uint8_t n, m;
-  transfer(a);
+  uint8_t l, n, m, o;
+#if VERBOSE > 1
+  Serial.print("CMD ["); Serial.print(a, HEX);
+  Serial.print(" "); Serial.print(b, HEX);
+  Serial.print(" "); Serial.print(c, HEX);
+  Serial.print(" "); Serial.print(d, HEX);
+  Serial.print("]");
+#endif
+  o = transfer(a);
   n = transfer(b);
   // if (n != a) error = -1;
   m = transfer(c);
-  return 0xFFFFFF & ((n << 16) + (m << 8) + transfer(d));
+  l = transfer(d);
+
+#if VERBOSE > 1
+  Serial.print(" ["); Serial.print(o, HEX);
+  Serial.print(" "); Serial.print(n, HEX);
+  Serial.print(" "); Serial.print(m, HEX);
+  Serial.print(" "); Serial.print(l, HEX);
+  Serial.print("]\n");
+#endif
+
+  return ((m << 8) + l);
 }
 
 uint8_t Adafruit_AVRProg::transfer(uint8_t out) {

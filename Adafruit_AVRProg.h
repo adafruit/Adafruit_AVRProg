@@ -12,9 +12,9 @@
 #define FUSE_HIGH 2 ///< High fuse
 #define FUSE_EXT 3  ///< Extended fuse
 
-//#define VERBOSE 1
+//#define VERBOSE 2
 
-#define FUSE_CLOCKSPEED 100000   ///< Fuses need to be programmed slowly
+#define FUSE_CLOCKSPEED 10000   ///< Fuses need to be programmed slowly
 #define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
 
 /**! Struct for holding one 'program' fuses & code */
@@ -80,7 +80,7 @@ private:
   bool startProgramMode(uint32_t clockrate = 100000);
   void endProgramMode(void);
 
-  uint16_t isp_transaction(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+  uint32_t isp_transaction(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
   uint8_t transfer(uint8_t out);
   void busyWait(void);
 
