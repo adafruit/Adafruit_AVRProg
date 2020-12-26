@@ -713,6 +713,12 @@ byte Adafruit_AVRProg::hexToByte(byte h) {
     return (h - '0');
   if (h >= 'A' && h <= 'F')
     return ((h - 'A') + 10);
+  if (h >= 'a' && h <= 'f')
+    return ((h - 'a') + 10);
+  Serial.print("Read odd char 0x");
+  Serial.print(h, HEX);
+  Serial.println();
+
   error(F("Bad hex digit!"));
   return -1;
 }
