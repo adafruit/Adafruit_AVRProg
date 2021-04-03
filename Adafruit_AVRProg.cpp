@@ -296,7 +296,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
   Serial.println(chipsize, DEC);
   Serial.print("Page size: ");
   Serial.println(pagesize, DEC);
-  while (pageaddr < chipsize) {
+  while (pageaddr < chipsize && hextext) {
     const byte *hextextpos =
         readImagePage(hextext, pageaddr, pagesize, pageBuffer);
 
@@ -377,7 +377,8 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     cksum += b;
     // Serial.print("Record type "); Serial.println(b, HEX);
     if (b == 0x1) {
-      // end record!
+      // end record, return nullptr to indicate we're done
+      hextext = nullptr;
       break;
     }
 #if VERBOSE
