@@ -165,7 +165,7 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
 /**************************************************************************/
 void Adafruit_AVRProg::eraseChip(void) {
   startProgramMode(FUSE_CLOCKSPEED);
-  if (isp_transaction(0xAC, 0x80, 0, 0) != 0x8000) { // chip erase
+  if (isp_transaction(0xAC, 0x80, 0, 0) & 0xFFFF != 0x8000) { // chip erase
     error(F("Error on chip erase command"));
   }
   busyWait();
@@ -190,7 +190,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Lock Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xE0, 0x00, f) != 0xE000) {
+    if (isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF != 0xE000) {
       return false;
     }
   }
@@ -198,7 +198,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Low Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA0, 0x00, f) != 0xA000) {
+    if (isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF != 0xA000) {
       return false;
     }
   }
@@ -206,7 +206,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet High Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA8, 0x00, f) != 0xA800) {
+    if (isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF != 0xA800) {
       return false;
     }
   }
@@ -214,7 +214,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Ext Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA4, 0x00, f) != 0xA400) {
+    if (isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF != 0xA400) {
       return false;
     }
   }
@@ -296,7 +296,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
   Serial.println(chipsize, DEC);
   Serial.print("Page size: ");
   Serial.println(pagesize, DEC);
-  while (pageaddr < chipsize) {
+  while (pageaddr < chipsize && hextext) {
     const byte *hextextpos =
         readImagePage(hextext, pageaddr, pagesize, pageBuffer);
 
@@ -377,7 +377,8 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     cksum += b;
     // Serial.print("Record type "); Serial.println(b, HEX);
     if (b == 0x1) {
-      // end record!
+      // end record, return nullptr to indicate we're done
+      hextext = nullptr;
       break;
     }
 #if VERBOSE
