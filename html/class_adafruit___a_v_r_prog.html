@@ -112,6 +112,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a676a4bdcdd661367b95d38b478867890">generateClock</a> (void)</td></tr>
 <tr class="memdesc:a676a4bdcdd661367b95d38b478867890"><td class="mdescLeft">&#160;</td><td class="mdescRight">If you somehow get a chip that is expecting an external clock or crystal, we can generate a 8MHz square wave on ATmega328's digital 9 that can be connected to the crystal input to clock it. ONLY FOR AVR 'HOSTS'! <br /></td></tr>
 <tr class="separator:a676a4bdcdd661367b95d38b478867890"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf7e12946fe349d79846fabb9ef8e7c5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#acf7e12946fe349d79846fabb9ef8e7c5">internalRcCalibration</a> ()</td></tr>
+<tr class="memdesc:acf7e12946fe349d79846fabb9ef8e7c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">If your target chip will be running with internal RC oscillator, We can perform an calibration with the method described in AVR053. ONLY FOR AVR 'HOSTS' with a crystal oscillator, which is accurate.  <a href="#acf7e12946fe349d79846fabb9ef8e7c5">More...</a><br /></td></tr>
+<tr class="separator:acf7e12946fe349d79846fabb9ef8e7c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc33b5868126cfa0eac741fa5f409605"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#adc33b5868126cfa0eac741fa5f409605">writeByteToFlash</a> (unsigned int addr, uint8_t pagesize, uint8_t content)</td></tr>
+<tr class="memdesc:adc33b5868126cfa0eac741fa5f409605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to write a byte to certain address in flash without page erase. Useful for parameters.  <a href="#adc33b5868126cfa0eac741fa5f409605">More...</a><br /></td></tr>
+<tr class="separator:adc33b5868126cfa0eac741fa5f409605"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac80fea89bca40a98524135e7839645c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ac80fea89bca40a98524135e7839645c6">targetPower</a> (bool poweron)</td></tr>
 <tr class="memdesc:ac80fea89bca40a98524135e7839645c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin/end programming, turn on/off a programming LED if we have one.  <a href="#ac80fea89bca40a98524135e7839645c6">More...</a><br /></td></tr>
 <tr class="separator:ac80fea89bca40a98524135e7839645c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -455,6 +461,71 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="acf7e12946fe349d79846fabb9ef8e7c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf7e12946fe349d79846fabb9ef8e7c5">&#9670;&nbsp;</a></span>internalRcCalibration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t Adafruit_AVRProg::internalRcCalibration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If your target chip will be running with internal RC oscillator, We can perform an calibration with the method described in AVR053. ONLY FOR AVR 'HOSTS' with a crystal oscillator, which is accurate. </p>
+<dl class="section return"><dt>Returns</dt><dd>Calibrated value of OSCCAL, 0xFF if anything goes wrong. </dd></dl>
+
+</div>
+</div>
+<a id="adc33b5868126cfa0eac741fa5f409605"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc33b5868126cfa0eac741fa5f409605">&#9670;&nbsp;</a></span>writeByteToFlash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AVRProg::writeByteToFlash </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>pagesize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>content</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function to write a byte to certain address in flash without page erase. Useful for parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">addr</td><td>Flash address you want to write to. </td></tr>
+    <tr><td class="paramname">pagesize</td><td>The flash-page size of this chip, in bytes. Check datasheet! </td></tr>
+    <tr><td class="paramname">content</td><td>The byte you want to write to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if flashing worked out. </dd></dl>
 
 </div>
 </div>

@@ -7,5 +7,6 @@ var searchData=
   ['image_5fname',['image_name',['../structimage.html#ae93f4dfe1efb34bbf94b8c26c6ee1c91',1,'image']]],
   ['image_5fnormfuses',['image_normfuses',['../structimage.html#a3be228290a0cf33bf76c0ffe1e6ad53b',1,'image']]],
   ['image_5fpagesize',['image_pagesize',['../structimage.html#a0d2c1bad81300e1297731d5295beea60',1,'image']]],
-  ['image_5fprogfuses',['image_progfuses',['../structimage.html#a886607fda3b6975b0c0c7dffb13c78ea',1,'image']]]
+  ['image_5fprogfuses',['image_progfuses',['../structimage.html#a886607fda3b6975b0c0c7dffb13c78ea',1,'image']]],
+  ['internalrccalibration',['internalRcCalibration',['../class_adafruit___a_v_r_prog.html#acf7e12946fe349d79846fabb9ef8e7c5',1,'Adafruit_AVRProg']]]
 ];

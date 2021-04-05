@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['verifyfuses',['verifyFuses',['../class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728',1,'Adafruit_AVRProg']]],
-  ['verifyimage',['verifyImage',['../class_adafruit___a_v_r_prog.html#a9014e47745719cbcf570685c2acce7a0',1,'Adafruit_AVRProg']]]
+  ['targetpower',['targetPower',['../class_adafruit___a_v_r_prog.html#ac80fea89bca40a98524135e7839645c6',1,'Adafruit_AVRProg']]]
 ];
