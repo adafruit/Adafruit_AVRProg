@@ -640,6 +640,7 @@ void Adafruit_AVRProg::generateClock() {
  @brief  If your target chip will be running with internal RC oscillator,
  We can perform an calibration with the method described in AVR053.
  ONLY FOR AVR 'HOSTS' with a crystal oscillator, which is accurate.
+ @return Calibrated value of OSCCAL, 0xFF if anything goes wrong.
  */
 /**************************************************************************/
 uint8_t Adafruit_AVRProg::internalRcCalibration() {
@@ -733,6 +734,11 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
 /*!
  @brief  Function to write a byte to certain address in Flash without
  page erase. Useful for parameters.
+ @param    Flash address you want to write to.
+ @param    pagesize The flash-page size of this chip, in bytes. Check
+ datasheet!
+ @param    The byte you want to write to.
+ @return True if flashing worked out.
  */
 /**************************************************************************/
 bool Adafruit_AVRProg::writeByteToFlash(unsigned int addr, uint8_t pagesize,
