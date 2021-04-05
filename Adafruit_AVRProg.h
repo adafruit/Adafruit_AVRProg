@@ -69,6 +69,8 @@ public:
     @param led The pin to use for the LED */
   void setErrorLED(uint8_t led) { errLED = led; }
   void generateClock(void);
+  uint8_t internalRcCalibration();
+  bool writeByteToFlash(unsigned int addr, uint8_t pagesize, uint8_t content);
 
   bool targetPower(bool poweron);
   uint16_t readSignature(void);
@@ -86,6 +88,7 @@ private:
 
   bool flashPage(byte *pagebuff, uint16_t pageaddr, uint8_t pagesize);
   bool flashWord(uint8_t hilo, uint16_t addr, uint8_t data);
+  int8_t readByteEEPROM(unsigned int addr);
   const byte *readImagePage(const byte *hextext, uint16_t pageaddr,
                             uint8_t pagesize, byte *page);
   byte hexToByte(byte h);
