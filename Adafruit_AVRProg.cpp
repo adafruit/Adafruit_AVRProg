@@ -643,7 +643,8 @@ void Adafruit_AVRProg::generateClock() {
  */
 /**************************************************************************/
 uint8_t Adafruit_AVRProg::internalRcCalibration() {
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) ||               \
+    defined(__AVR_ATmega328__)
   Serial.println(F("Perform Internal RC Calibration"));
 
   unsigned char osscal_value = 0xFF;
@@ -661,8 +662,8 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
   pinMode(_mosi, INPUT);
   digitalWrite(_mosi, HIGH); // pull UP mosi
   digitalWrite(_miso, LOW);  // no pull up. Seems pull up will mess up with
-                            // target
-  digitalWrite(_sck, HIGH); // pull UP sck, suppress noise
+                             // target
+  digitalWrite(_sck, HIGH);  // pull UP sck, suppress noise
   // let MOSI act as OC2A, 16E6/(2*244)=32787
 
   TCCR2A = 0;
