@@ -643,7 +643,7 @@ void Adafruit_AVRProg::generateClock() {
  */
 /**************************************************************************/
 uint8_t Adafruit_AVRProg::internalRcCalibration() {
-#ifdef __AVR__
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
   Serial.println(F("Perform Internal RC Calibration"));
 
   unsigned char osscal_value = 0xFF;
@@ -724,7 +724,7 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
   return osscal_value;
 
 #else
-  error(F("Internal RC Calibration only supported on AVRs"));
+  error(F("Internal RC Calibration only supported on ATmega328 AVRs"));
 #endif
 }
 
