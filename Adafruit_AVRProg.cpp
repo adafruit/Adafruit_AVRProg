@@ -732,12 +732,12 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
 
 /**************************************************************************/
 /*!
- @brief  Function to write a byte to certain address in Flash without
+ @brief  Function to write a byte to certain address in flash without
  page erase. Useful for parameters.
- @param    Flash address you want to write to.
+ @param    addr Flash address you want to write to.
  @param    pagesize The flash-page size of this chip, in bytes. Check
  datasheet!
- @param    The byte you want to write to.
+ @param    content The byte you want to write to.
  @return True if flashing worked out.
  */
 /**************************************************************************/
