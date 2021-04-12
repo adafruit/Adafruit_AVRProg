@@ -194,6 +194,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
       return false;
     }
   }
+  busyWait();
   f = pgm_read_byte(&fuses[FUSE_LOW]);
   if (f) {
     Serial.print(F("\tSet Low Fuse to: "));
@@ -202,6 +203,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
       return false;
     }
   }
+  busyWait();
   f = pgm_read_byte(&fuses[FUSE_HIGH]);
   if (f) {
     Serial.print(F("\tSet High Fuse to: "));
@@ -210,6 +212,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
       return false;
     }
   }
+  busyWait();
   f = pgm_read_byte(&fuses[FUSE_EXT]);
   if (f) {
     Serial.print(F("\tSet Ext Fuse to: "));
@@ -218,6 +221,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
       return false;
     }
   }
+  busyWait();
   Serial.println();
   endProgramMode();
   return true;
