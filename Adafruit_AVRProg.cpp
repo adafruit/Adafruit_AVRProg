@@ -1,5 +1,6 @@
 // Useful message printing definitions
 #include "Adafruit_AVRProg.h"
+#include "Adafruit_UPDIProg.h"
 
 static byte pageBuffer[128]; /* One page of flash */
 
@@ -46,6 +47,12 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
   _sck = sck_pin;
 }
 
+void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, int8_t power_pin) {
+  uart = theSerial;
+  _power = power_pin;
+}
+
+
 /**************************************************************************/
 /*!
     @brief  End any SPI transactions, set reset pin to input with no pullup
@@ -53,8 +60,8 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
 /**************************************************************************/
 void Adafruit_AVRProg::endProgramMode(void) {
   if (spi) {
-    SPI.endTransaction();
-    SPI.end();
+    spi->endTransaction();
+    spi->end();
   } else {
     pinMode(_miso, INPUT);
     pinMode(_mosi, INPUT);
@@ -77,7 +84,7 @@ void Adafruit_AVRProg::endProgramMode(void) {
 /**************************************************************************/
 bool Adafruit_AVRProg::targetPower(bool poweron) {
   if (poweron) {
-    if (progLED > 0) {
+    if (progLED >= 0) {
       pinMode(progLED, OUTPUT);
       digitalWrite(progLED, HIGH);
     }
@@ -91,7 +98,7 @@ bool Adafruit_AVRProg::targetPower(bool poweron) {
     }
   } else {
     endProgramMode();
-    if (progLED > 0) {
+    if (progLED >= 0) {
       digitalWrite(progLED, LOW);
     }
     return true;
@@ -99,38 +106,60 @@ bool Adafruit_AVRProg::targetPower(bool poweron) {
 }
 
 bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
-  pinMode(_reset, OUTPUT);
-  digitalWrite(_reset, HIGH);
-  delay(5);
+  if (uart) { // its UPDI time!
+    if (_power >= 0) {
+      pinMode(_power, OUTPUT);
+      digitalWrite(_power, LOW);
+      delay(10);
+      digitalWrite(_power, HIGH);
+      delay(10);
+    }
+    updi_serial_init();
+    updi_send_handshake();
+    delay(3);
 
-  if (spi) {
-    debug("Using hardware SPI");
-    SPI.begin();
-    SPI.beginTransaction(SPISettings(clockspeed, MSBFIRST, SPI_MODE0));
-  } else if (_sck > 0 && _mosi > 0 && _miso > 0) {
-    debug("Using software SPI");
-    pinMode(_sck, OUTPUT);
-    digitalWrite(_sck, LOW);
-    pinMode(_miso, INPUT);
-    pinMode(_mosi, OUTPUT);
-    float _delay = 1000.0 * 1000.0 / (float)clockspeed;
-    // Serial.println(_delay);
-    spiBitDelay = _delay;
+    udpi_stcs(UPDI_CS_CTRLB, 1 << UPDI_CTRLB_CCDETDIS_BIT);
+    udpi_stcs(UPDI_CS_CTRLA, 1 << UPDI_CTRLA_IBDLY_BIT);
+    return updi_check();
   } else {
-    error(F("Neither hardware or software SPI modes selected"));
-  }
-  debug("...spi_init done");
-  digitalWrite(_reset, LOW);
+      if (_reset >= 0) {
+        pinMode(_reset, OUTPUT);
+        digitalWrite(_reset, HIGH);
+        delay(5);
+      }
 
-  debug("...isp_transaction");
-  uint16_t reply = isp_transaction(0xAC, 0x53, 0x00, 0x00);
-  if (reply == 0x5300) {
-    debug("...Done");
-    programmode = true;
-    return true;
+      if (spi) {
+        debug("Using hardware SPI");
+        spi->begin();
+        spi->beginTransaction(SPISettings(clockspeed, MSBFIRST, SPI_MODE0));
+      } else if (_sck > 0 && _mosi > 0 && _miso > 0) {
+        debug("Using software SPI");
+        pinMode(_sck, OUTPUT);
+        digitalWrite(_sck, LOW);
+        pinMode(_miso, INPUT);
+        pinMode(_mosi, OUTPUT);
+        float _delay = 1000.0 * 1000.0 / (float)clockspeed;
+        // Serial.println(_delay);
+        spiBitDelay = _delay;
+      } else {
+        error(F("Neither hardware or software SPI modes selected"));
+      }
+      debug("...spi_init done");
+
+      if (_reset >= 0) {
+        digitalWrite(_reset, LOW);
+      }
+
+      debug("...isp_transaction");
+      uint16_t reply = isp_transaction(0xAC, 0x53, 0x00, 0x00);
+      if (reply == 0x5300) {
+        debug("...Done");
+        programmode = true;
+        return true;
+      }
+      Serial.print(reply, HEX);
+      return false;
   }
-  Serial.print(reply, HEX);
-  return false;
 }
 
 /*******************************************************
@@ -165,7 +194,7 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
 /**************************************************************************/
 void Adafruit_AVRProg::eraseChip(void) {
   startProgramMode(FUSE_CLOCKSPEED);
-  if (isp_transaction(0xAC, 0x80, 0, 0) & 0xFFFF != 0x8000) { // chip erase
+  if ((isp_transaction(0xAC, 0x80, 0, 0) & 0xFFFF) != 0x8000) { // chip erase
     error(F("Error on chip erase command"));
   }
   busyWait();
@@ -190,7 +219,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Lock Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF != 0xE000) {
+    if ((isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF) != 0xE000) {
       return false;
     }
   }
@@ -199,7 +228,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Low Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF != 0xA000) {
+    if ((isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF) != 0xA000) {
       return false;
     }
   }
@@ -208,7 +237,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet High Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF != 0xA800) {
+    if ((isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF) != 0xA800) {
       return false;
     }
   }
@@ -217,7 +246,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses) {
   if (f) {
     Serial.print(F("\tSet Ext Fuse to: "));
     Serial.println(f, HEX);
-    if (isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF != 0xA400) {
+    if ((isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF) != 0xA400) {
       return false;
     }
   }
@@ -731,6 +760,7 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
 
 #else
   error(F("Internal RC Calibration only supported on ATmega328 AVRs"));
+  return 0xFF;
 #endif
 }
 
@@ -757,6 +787,10 @@ bool Adafruit_AVRProg::writeByteToFlash(unsigned int addr, uint8_t pagesize,
 uint32_t Adafruit_AVRProg::isp_transaction(uint8_t a, uint8_t b, uint8_t c,
                                            uint8_t d) {
   uint8_t l, n, m, o;
+  (void)o; // avoid unused var warning
+  (void)m; // avoid unused var warning
+  (void)n; // avoid unused var warning
+
 #if VERBOSE > 1
   Serial.print("CMD [");
   Serial.print(a, HEX);

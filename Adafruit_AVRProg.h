@@ -60,6 +60,19 @@ public:
   void setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
               int8_t miso_pin);
 
+  void setUPDI(HardwareSerial *theUART, int8_t power_pin = -1);
+  void updi_serial_init(void);
+  int updi_serial_read_wait(void);
+  bool updi_serial_send(uint8_t *data, uint16_t size);
+  bool updi_serial_send_receive(uint8_t *data, uint16_t size, uint8_t *buff, uint32_t len);
+
+  void updi_send_handshake(void);
+  bool udpi_stcs(uint8_t address, uint8_t value);
+  uint8_t updi_ldcs(uint8_t address);
+  bool updi_check(void);
+  bool updi_device_force_reset(void);
+  void updi_serial_force_break(void);
+
   /*!
     @brief  Set up a GPIO as a programming-indicator LED
     @param led The pin to use for the LED */
@@ -93,11 +106,17 @@ private:
                             uint8_t pagesize, byte *page);
   byte hexToByte(byte h);
 
-  int8_t _reset, _mosi, _miso, _sck;
+  int8_t _reset = -1, _mosi = -1, _miso = -1, _sck = -1;
   uint16_t spiBitDelay;
   int8_t progLED, errLED;
-  SPIClass *spi;
+  SPIClass *spi = NULL;
   bool programmode;
+
+  HardwareSerial *uart = NULL;
+  int8_t _power = -1;
+  uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
+  uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
+  bool _updi_serial_inited = false;
 };
 
 #endif
