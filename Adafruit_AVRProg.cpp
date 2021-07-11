@@ -107,20 +107,30 @@ bool Adafruit_AVRProg::targetPower(bool poweron) {
 
 bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
   if (uart) { // its UPDI time!
-    if (_power >= 0) {
-      pinMode(_power, OUTPUT);
-      digitalWrite(_power, LOW);
-      delay(10);
-      digitalWrite(_power, HIGH);
-      delay(10);
-    }
-    updi_serial_init();
-    updi_send_handshake();
-    delay(3);
 
-    udpi_stcs(UPDI_CS_CTRLB, 1 << UPDI_CTRLB_CCDETDIS_BIT);
-    udpi_stcs(UPDI_CS_CTRLA, 1 << UPDI_CTRLA_IBDLY_BIT);
-    return updi_check();
+    updi_init(true);
+
+    if (! updi_check()) {
+      VERBOSE("UPDI not initialised\n");
+      
+      if (!updi_device_force_reset()) {
+        VERBOSE("double BREAK reset failed\n");
+        return false;
+      }
+      updi_init(false);	// re-init the UPDI interface
+      
+      if (!updi_check()) {
+        VERBOSE("Cannot initialise UPDI, aborting.\n");
+        // TODO find out why these are not already correct
+        g_updi.initialized = false;
+        g_updi.unlocked = false;
+        return false;
+      } else {
+        VERBOSE("UPDI INITIALISED\n");
+        g_updi.initialized = true;
+      }
+    }
+    return true;
   } else {
       if (_reset >= 0) {
         pinMode(_reset, OUTPUT);
@@ -174,17 +184,23 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
 */
 /**************************************************************************/
 uint16_t Adafruit_AVRProg::readSignature(void) {
-  startProgramMode(FUSE_CLOCKSPEED);
-
-  uint16_t target_type = 0;
-
-  target_type = isp_transaction(0x30, 0x00, 0x01, 0x00);
-  target_type <<= 8;
-  target_type |= isp_transaction(0x30, 0x00, 0x02, 0x00);
-
-  endProgramMode();
-
-  return target_type;
+  if (uart) {
+    updi_run_tasks(UPDI_TASK_GET_INFO, NULL);
+    return 0;
+  } else {
+    // SPI mode
+    startProgramMode(FUSE_CLOCKSPEED);
+    
+    uint16_t target_type = 0;
+    
+    target_type = isp_transaction(0x30, 0x00, 0x01, 0x00);
+    target_type <<= 8;
+    target_type |= isp_transaction(0x30, 0x00, 0x02, 0x00);
+    
+    endProgramMode();
+    
+    return target_type;
+  }
 }
 
 /**************************************************************************/

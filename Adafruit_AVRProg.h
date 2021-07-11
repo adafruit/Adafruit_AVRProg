@@ -6,6 +6,7 @@
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 #endif
+#include "Adafruit_UPDIProg.h"
 
 #define FUSE_PROT 0 ///< memory protection
 #define FUSE_LOW 1  ///< Low fuse
@@ -67,11 +68,48 @@ public:
   bool updi_serial_send_receive(uint8_t *data, uint16_t size, uint8_t *buff, uint32_t len);
 
   void updi_send_handshake(void);
+  void updi_serial_term();
+  void updi_term();
+
   bool udpi_stcs(uint8_t address, uint8_t value);
   uint8_t updi_ldcs(uint8_t address);
+  uint8_t updi_ld(uint16_t address);
+  bool updi_st(uint32_t address, uint8_t value);
+  bool updi_ld_ptr_inc(uint8_t *buffer, uint16_t size);
+
+  bool updi_write_data(uint32_t address, uint8_t *data, uint32_t len);
+  bool updi_read_data(uint32_t address, uint8_t *buf, uint32_t size);
+
+  void updi_st_ptr_inc16(uint8_t *data, uint32_t numwords);
+  void updi_set_repeat(uint16_t repeats);
+  bool updi_st_ptr_inc(uint8_t *data, uint32_t size);
+  bool updi_st_ptr(uint32_t address);
+
   bool updi_check(void);
   bool updi_device_force_reset(void);
   void updi_serial_force_break(void);
+  bool updiIsConnected(bool silent);
+  bool updi_init(bool force);
+  void updi_run_tasks(uint16_t tasks, uint8_t* data);
+  bool updi_wait_flash_ready();
+  bool updi_execute_nvm_command(uint8_t command);
+
+  void updi_apply_reset();
+  bool updi_wait_unlocked(uint32_t timeout);
+  bool updi_is_prog_mode();
+  bool updi_progmode_key();
+  bool updi_enter_progmode();
+  void updi_leave_progmode();
+
+  bool updi_unlock_device();
+  bool updi_get_device_info();
+
+  bool updi_write_fuse(uint8_t fuse, uint8_t value);
+  uint8_t updi_read_fuse(uint8_t fuse);
+  bool updi_erase_chip();
+  void updi_write_key(uint8_t size, uint8_t *key);
+  bool updi_chip_data_init_info(uint16_t sig, char *shortname, bool format);
+  DeviceIdentification *updi_chip_lookup(uint16_t sig, char *name);
 
   /*!
     @brief  Set up a GPIO as a programming-indicator LED
@@ -117,6 +155,7 @@ private:
   uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
   uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
   bool _updi_serial_inited = false;
+  UPDI g_updi;
 };
 
 #endif

@@ -1,4 +1,16 @@
-#include "Adafruit_AVRProg.h"
+#ifndef _ADAFRUIT_UPDIPROG_H
+#define _ADAFRUIT_UPDIPROG_H
+
+#include <Arduino.h>
+
+
+
+#define AVRDEBUG(fmt, ...)	{Serial.print("\t[AVR]\t"); Serial.printf(fmt, ##__VA_ARGS__);}
+#define DEBUG(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
+#define DEBUG_TASK(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
+#define VERBOSE(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
+//#define DEBUG_PHYSICAL(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
+#define DEBUG_PHYSICAL(fmt, ...)
 
 #define UPDI_BREAK 0x00
 
@@ -37,6 +49,21 @@
 #define UPDI_PHY_ACK  0x40
 
 #define UPDI_MAX_REPEAT_SIZE 0xFF
+
+// TASKS
+#define UPDI_TASK_ERASE			1
+#define UPDI_TASK_READ_FUSES	2
+#define UPDI_TASK_WRITE_FUSES	4
+#define UPDI_TASK_READ_FLASH	8
+#define UPDI_TASK_WRITE_FLASH	16
+#define UPDI_TASK_VERIFY_FLASH	32
+#define UPDI_TASK_READ_EEPROM	64
+#define UPDI_TASK_WRITE_EEPROM	128
+#define UPDI_TASK_GET_INFO		256
+#define UPDI_TASK_WRITE_USERROW 512
+#define UPDI_TASKS				(UPDI_TASK_GET_INFO | UPDI_TASK_READ_FUSES | UPDI_TASK_WRITE_FUSES | UPDI_TASK_READ_FLASH | UPDI_TASK_ERASE | UPDI_TASK_WRITE_FLASH | UPDI_TASK_READ_EEPROM | UPDI_TASK_WRITE_EEPROM | UPDI_TASK_WRITE_USERROW)
+
+
 
 //CS and ASI Register Address map
 #define UPDI_CS_STATUSA		0x00
@@ -129,3 +156,58 @@
 #define AVR_FUSE_RESV9	 0x1289
 #define AVR_FUSE_LOCK	 0x128A
 
+#define AVR_PAGESIZE_MAX 256	// it is probably 128 but I have not checked all possible chips
+
+typedef struct {
+	uint16_t signature; // all signatures begin with 0x1E and then 2 bytes
+	char shortname[8];
+	char longname[16];
+	uint8_t config;
+} DeviceIdentification;
+
+// AVR configurations
+#define AVR8X_TINY_2X  0
+#define AVR8X_TINY_4X  1
+#define AVR8X_TINY_8X  2
+#define AVR8X_TINY_16X 3
+#define AVR8X_MEGA_320 4
+#define AVR8X_MEGA_321 5
+#define AVR8X_MEGA_480 6
+
+typedef struct {
+	uint32_t flash_start;
+	uint32_t flash_size;
+	uint8_t flash_pagesize;
+	uint16_t eeprom_size;
+	uint16_t eeprom_pagesize;
+} DeviceConfiguration;
+
+typedef struct {
+	char family[8];
+	char nvm_version[4];
+	char ocd_version[4];
+	uint8_t signature_bytes[3];
+	char dbg_osc_freq;
+	uint8_t pdi_rev;
+	uint8_t dev_rev;
+	int8_t error_16v3;
+	int8_t error_16v5;
+	int8_t error_20v3;
+	int8_t error_20v5;
+	uint8_t uid[10];
+} DeviceDetails; // data read from chip
+
+typedef struct {
+	bool initialized;
+	bool unlocked;
+	bool verified;
+	DeviceIdentification *device;
+	DeviceConfiguration *config;
+	DeviceDetails details; // this is data read from device
+	uint8_t fuses[AVR_NUM_FUSES];
+} UPDI;
+
+
+
+
+#endif
