@@ -111,22 +111,22 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
     updi_init(true);
 
     if (! updi_check()) {
-      VERBOSE("UPDI not initialised\n");
+      DEBUG_VERBOSE("UPDI not initialised\n");
       
       if (!updi_device_force_reset()) {
-        VERBOSE("double BREAK reset failed\n");
+        DEBUG_VERBOSE("double BREAK reset failed\n");
         return false;
       }
       updi_init(false);	// re-init the UPDI interface
       
       if (!updi_check()) {
-        VERBOSE("Cannot initialise UPDI, aborting.\n");
+        DEBUG_VERBOSE("Cannot initialise UPDI, aborting.\n");
         // TODO find out why these are not already correct
         g_updi.initialized = false;
         g_updi.unlocked = false;
         return false;
       } else {
-        VERBOSE("UPDI INITIALISED\n");
+        DEBUG_VERBOSE("UPDI INITIALISED\n");
         g_updi.initialized = true;
       }
     }
@@ -186,7 +186,14 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
 uint16_t Adafruit_AVRProg::readSignature(void) {
   if (uart) {
     updi_run_tasks(UPDI_TASK_GET_INFO, NULL);
-    return 0;
+
+    uint16_t sig = 0;
+    sig = g_updi.details.signature_bytes[1];
+    sig <<= 8;
+    sig |= g_updi.details.signature_bytes[2];
+
+    return sig;
+
   } else {
     // SPI mode
     startProgramMode(FUSE_CLOCKSPEED);
@@ -209,13 +216,40 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
 */
 /**************************************************************************/
 void Adafruit_AVRProg::eraseChip(void) {
-  startProgramMode(FUSE_CLOCKSPEED);
-  if ((isp_transaction(0xAC, 0x80, 0, 0) & 0xFFFF) != 0x8000) { // chip erase
-    error(F("Error on chip erase command"));
+  if (uart) {
+    updi_run_tasks(UPDI_TASK_ERASE, NULL);
+  } else {
+    startProgramMode(FUSE_CLOCKSPEED);
+    if ((isp_transaction(0xAC, 0x80, 0, 0) & 0xFFFF) != 0x8000) { // chip erase
+      error(F("Error on chip erase command"));
+    }
+    busyWait();
+    endProgramMode();
   }
-  busyWait();
-  endProgramMode();
 }
+
+
+/**************************************************************************/
+/*!
+    @brief    Program the fuses on a device
+    @param    fuses Pointer to 4-byte array of fuses
+    @return True if we were able to send data and get a response from the chip.
+    You could still run verifyFuses() afterwards!
+*/
+/**************************************************************************/
+bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
+  if (uart) {
+    updi_run_tasks(UPDI_TASK_READ_FUSES, NULL);
+    for (uint8_t i=0; i<numbytes; i++) {
+      fuses[i] = g_updi.fuses[i];
+    }
+    return true;
+  } else {
+    // todo: SPI!
+    return false;
+  }
+}
+
 
 /**************************************************************************/
 /*!
@@ -380,7 +414,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
 
   byte b, cksum = 0;
 
-  // Serial.print("page size = "); Serial.println(pagesize, DEC);
+  Serial.print("page size = "); Serial.println(pagesize, DEC);
 
   // 'empty' the page by filling it with 0xFF's
   for (uint8_t i = 0; i < pagesize; i++)
@@ -396,7 +430,6 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
       continue;
     }
     if (c != ':') {
-      Serial.print(c);
       error(F(" No colon?"));
       break;
     }
@@ -404,6 +437,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     len = hexToByte(pgm_read_byte(hextext++));
     len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
     cksum = len;
+    Serial.print(len);
 
     // read high address byte
     b = hexToByte(pgm_read_byte(hextext++));
@@ -424,7 +458,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     b = hexToByte(pgm_read_byte(hextext++)); // record type
     b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
     cksum += b;
-    // Serial.print("Record type "); Serial.println(b, HEX);
+    //Serial.print("Record type "); Serial.println(b, HEX);
     if (b == 0x1) {
       // end record, return nullptr to indicate we're done
       hextext = nullptr;
@@ -491,95 +525,147 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     error
 */
 /**************************************************************************/
-boolean Adafruit_AVRProg::verifyImage(const byte *hextext) {
-  startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
+bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
+  if (uart) {
+    uint32_t pageaddr = 0;
+    uint16_t pagesize = g_updi.config->flash_pagesize, 
+      chipsize = g_updi.config->flash_size;
+    uint8_t buffer2[pagesize];
 
-  uint16_t len;
-  byte b, cksum = 0;
+    Serial.print("Chip size: ");
+    Serial.println(chipsize, DEC);
+    Serial.print("Page size: ");
+    Serial.println(pagesize, DEC);
 
-  while (1) {
-    uint16_t lineaddr;
+    while ((pageaddr < chipsize) && hextext) {
+      Serial.println("reading page");
+      const byte *hextextpos =
+        readImagePage(hextext, pageaddr, pagesize, pageBuffer);
+      
+      bool blankpage = true;
+      for (uint8_t i = 0; i < pagesize; i++) {
+        if (pageBuffer[i] != 0xFF)
+          blankpage = false;
+      }
+      if (!blankpage) {
+        Serial.println("Compare!");
 
-    // read one line!
-    char c = pgm_read_byte(hextext++);
-    if (c == '\n' || c == '\r') {
-      continue;
+        updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, pagesize);
+
+        for (uint8_t i = 0; i < pagesize; i++) {
+          if (pageBuffer[i] != buffer2[i]) {
+            Serial.print("Verification error!");
+            Serial.println("----");
+            for (uint8_t i = 0; i < pagesize; i++) {
+              Serial.printf("0x%02X, ", pageBuffer[i]);
+              if ((i % 16) == 15) {
+                Serial.println();
+              }
+            }
+            Serial.print("\n vs. \n");
+            for (uint8_t i = 0; i < pagesize; i++) {
+              Serial.printf("0x%02X, ", buffer2[i]);
+              if ((i % 16) == 15) {
+                Serial.println();
+              }
+            }
+            Serial.println("----");
+            return false;
+          }
+        }
+      }
+      hextext = hextextpos;
+      pageaddr += pagesize;
     }
-    if (c != ':') {
-      Serial.print(c);
-      error(F(" No colon?"));
-      break;
-    }
-    len = hexToByte(pgm_read_byte(hextext++));
-    len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
-    cksum = len;
-
-    b = hexToByte(pgm_read_byte(hextext++)); // record type
-    b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
-    cksum += b;
-    lineaddr = b;
-    b = hexToByte(pgm_read_byte(hextext++)); // record type
-    b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
-    cksum += b;
-    lineaddr = (lineaddr << 8) + b;
-
-    b = hexToByte(pgm_read_byte(hextext++)); // record type
-    b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
-    cksum += b;
-
-    // Serial.print("Record type "); Serial.println(b, HEX);
-    if (b == 0x1) {
-      // end record!
-      break;
-    }
-
-    for (byte i = 0; i < len; i++) {
-      // read 'n' bytes
-      b = hexToByte(pgm_read_byte(hextext++));
+  } else {
+    startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
+    
+    uint16_t len;
+    byte b, cksum = 0;
+    
+    while (1) {
+      uint16_t lineaddr;
+      
+      // read one line!
+      char c = pgm_read_byte(hextext++);
+      if (c == '\n' || c == '\r') {
+        continue;
+      }
+      if (c != ':') {
+        Serial.print(c);
+        error(F(" No colon?"));
+        break;
+      }
+      len = hexToByte(pgm_read_byte(hextext++));
+      len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
+      cksum = len;
+      
+      b = hexToByte(pgm_read_byte(hextext++)); // record type
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum += b;
-
+      lineaddr = b;
+      b = hexToByte(pgm_read_byte(hextext++)); // record type
+      b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
+      cksum += b;
+      lineaddr = (lineaddr << 8) + b;
+      
+      b = hexToByte(pgm_read_byte(hextext++)); // record type
+      b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
+      cksum += b;
+      
+      // Serial.print("Record type "); Serial.println(b, HEX);
+      if (b == 0x1) {
+        // end record!
+        break;
+      }
+      
+      for (byte i = 0; i < len; i++) {
+        // read 'n' bytes
+        b = hexToByte(pgm_read_byte(hextext++));
+        b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
+        cksum += b;
+        
 #if VERBOSE
-      Serial.print("$");
-      Serial.print(lineaddr, HEX);
-      Serial.print(":0x");
-      Serial.print(b, HEX);
-      Serial.write(" ? ");
-#endif
-
-      // verify this byte!
-      byte reply;
-      if (lineaddr % 2) { // for 'high' bytes
-        reply = isp_transaction(0x28, lineaddr >> 9, lineaddr / 2, 0) & 0xFF;
-      } else { // for 'low' bytes
-        reply = isp_transaction(0x20, lineaddr >> 9, lineaddr / 2, 0) & 0xFF;
-      }
-      if (b != reply) {
-        Serial.print(F("Verification error at address 0x"));
+        Serial.print("$");
         Serial.print(lineaddr, HEX);
-        Serial.print(F(" Should be 0x"));
+        Serial.print(":0x");
         Serial.print(b, HEX);
-        Serial.print(F(" not 0x"));
-        Serial.println(reply, HEX);
-        return false;
+        Serial.write(" ? ");
+#endif
+        
+        // verify this byte!
+        byte reply;
+        if (lineaddr % 2) { // for 'high' bytes
+          reply = isp_transaction(0x28, lineaddr >> 9, lineaddr / 2, 0) & 0xFF;
+        } else { // for 'low' bytes
+          reply = isp_transaction(0x20, lineaddr >> 9, lineaddr / 2, 0) & 0xFF;
+        }
+        if (b != reply) {
+          Serial.print(F("Verification error at address 0x"));
+          Serial.print(lineaddr, HEX);
+          Serial.print(F(" Should be 0x"));
+          Serial.print(b, HEX);
+          Serial.print(F(" not 0x"));
+          Serial.println(reply, HEX);
+          return false;
+        }
+        lineaddr++;
       }
-      lineaddr++;
+      
+      b = hexToByte(pgm_read_byte(hextext++)); // chxsum
+      b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
+      cksum += b;
+      if (cksum != 0) {
+        Serial.print(cksum, HEX);
+        error(F(" - bad checksum"));
+      }
+      if (pgm_read_byte(hextext++) != '\n') {
+        error("No end of line");
+      }
     }
-
-    b = hexToByte(pgm_read_byte(hextext++)); // chxsum
-    b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
-    cksum += b;
-    if (cksum != 0) {
-      Serial.print(cksum, HEX);
-      error(F(" - bad checksum"));
-    }
-    if (pgm_read_byte(hextext++) != '\n') {
-      error("No end of line");
-    }
+    
+    endProgramMode();
   }
-
-  endProgramMode();
-
   return true;
 }
 

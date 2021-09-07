@@ -431,9 +431,9 @@ bool Adafruit_AVRProg::updi_init(bool force) {
 }
 
 //run the updi process based on the 'command bits' provided
-void Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data) {
+void Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t address, uint32_t size) {
 	long unsigned int start = millis();
-	int32_t datasize = 0;
+	//int32_t datasize = 0;
 
 	if (!(tasks & (UPDI_TASKS))) {
 		DEBUG_TASK("No UPDI tasks specified\n");
@@ -549,6 +549,23 @@ void Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data) {
 			}
 		}
 
+		//save flash into updi array
+		if (tasks & UPDI_TASK_READ_FLASH) {
+          Serial.println(F("Reading flash"));
+          DEBUG("Reading %d bytes starting at %04X\n", size, address);
+          if (data == NULL) {
+            Serial.println(F("Data pointer null"));
+            return;
+          }
+
+          if (!updi_read_page(address, size, data)) {
+            Serial.println("Reading flash failed");
+            break;
+          } else {
+            Serial.println("Reading flash OK");
+          }
+		}
+
         /*
 		//Write flash from hex file
 		if (tasks & UPDI_TASK_WRITE_FLASH) {
@@ -589,26 +606,11 @@ void Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data) {
 			}
 			MESSAGE("Verify flash passed\n");
 		}
+        */
 
-		//save flash into updi array
-		if (tasks & UPDI_TASK_READ_FLASH) {
-			MESSAGE("Reading flash\n");
-			//hexfInit();
-			DEBUG_PHYSICAL("Reading %d bytes starting at %04X\n", g_updi.config->flash_size, g_updi.config->flash_start);
 
-			// read flash 'save' = dump contents = store in memory buffer
-			data->rewind();
-			if (!_updi_read_address_space(g_updi.config->flash_start, g_updi.config->flash_pagesize, g_updi.config->flash_size, data, true)) {
-				MESSAGE("Reading flash failed\n");
-				break;
-			} else {
-				data->rewind();
-				//data->resize(g_updi.config->flash_size, g_updi.config->flash_pagesize);
-				datasize = data->available();
-				MESSAGE("Read %d bytes: \n", datasize);
-			}
-		}
 
+        /*
 		//Write eeprom from hex file
 		if (tasks & UPDI_TASK_WRITE_EEPROM) {
 			MESSAGE("Writing eeprom\n");
@@ -704,7 +706,7 @@ void Adafruit_AVRProg::updi_apply_reset() {
 		uint8_t b;
 		if (!((b = updi_ldcs(UPDI_ASI_SYS_STATUS)) & (1 << UPDI_ASI_SYS_STATUS_RSTSYS)))
 			break;
-		//VERBOSE("Wait for release %03d ( %02X != %02X)\n", retries, b, (1 << UPDI_ASI_SYS_STATUS_RSTSYS));
+		//DEBUG_VERBOSE("Wait for release %03d ( %02X != %02X)\n", retries, b, (1 << UPDI_ASI_SYS_STATUS_RSTSYS));
 	}
 	if (!retries) {
 		// if our retry counter rolled over, then we failed to reset
@@ -723,7 +725,7 @@ bool Adafruit_AVRProg::updi_wait_unlocked(uint32_t timeout) {
 		}
 	}
 
-	VERBOSE("TIMEOUT WAITING FOR DEVICE TO UNLOCK\n");
+	DEBUG_VERBOSE("TIMEOUT WAITING FOR DEVICE TO UNLOCK\n");
 	g_updi.unlocked = false;
 
 	return false;
@@ -763,13 +765,13 @@ bool Adafruit_AVRProg::updi_enter_progmode() {
 
 	//Wait for unlock
 	if (!updi_wait_unlocked(100)) {
-		VERBOSE("FAILED TO ENTER NVM PROGRAMMING MODE, DEVICE IS LOCKED\n");
+		DEBUG_VERBOSE("FAILED TO ENTER NVM PROGRAMMING MODE, DEVICE IS LOCKED\n");
 		return false;
 	}
 
 	//updi_check for NVMPROG flag
 	if (!updi_is_prog_mode()) {
-		VERBOSE("STILL NOT IN PROG MODE\n");
+		DEBUG_VERBOSE("STILL NOT IN PROG MODE\n");
 		return false;
 	}
 	g_updi.unlocked = true;
@@ -778,7 +780,7 @@ bool Adafruit_AVRProg::updi_enter_progmode() {
 
 //Disables UPDI which releases any keys enabled
 void Adafruit_AVRProg::updi_leave_progmode() {
-	VERBOSE("leaving progmode...\n");
+	DEBUG_VERBOSE("leaving progmode...\n");
 	updi_apply_reset();
 	udpi_stcs(UPDI_CS_CTRLB, (1 << UPDI_CTRLB_UPDIDIS_BIT) | (1 << UPDI_CTRLB_CCDETDIS_BIT));
 
@@ -787,7 +789,7 @@ void Adafruit_AVRProg::updi_leave_progmode() {
 
 //Unlock and erase
 bool Adafruit_AVRProg::updi_unlock_device() {
-	VERBOSE("UNLOCKING AND ERASING\n");
+	DEBUG_VERBOSE("UNLOCKING AND ERASING\n");
 
 	//enter key
 	updi_write_key(UPDI_KEY_64, (uint8_t *)UPDI_KEY_CHIPERASE);
@@ -796,7 +798,7 @@ bool Adafruit_AVRProg::updi_unlock_device() {
 	uint8_t key_status = updi_ldcs(UPDI_ASI_KEY_STATUS);
 
 	if (!(key_status & (1 << UPDI_ASI_KEY_STATUS_CHIPERASE))) {
-		VERBOSE("Unlock error: key not accepted\n");
+		DEBUG_VERBOSE("Unlock error: key not accepted\n");
 		return false;
 	}
 
@@ -809,11 +811,11 @@ bool Adafruit_AVRProg::updi_unlock_device() {
 
 	//wait for unlock
 	if (!updi_wait_unlocked(100)) {
-		VERBOSE("Failed to chip erase using key\n");
+		DEBUG_VERBOSE("Failed to chip erase using key\n");
 		return false;
 	}
 
-	VERBOSE("UNLOCKED DEVICE\n");
+	DEBUG_VERBOSE("UNLOCKED DEVICE\n");
 
 	return true;
 }
@@ -821,7 +823,7 @@ bool Adafruit_AVRProg::updi_unlock_device() {
 
 //Get device info
 bool Adafruit_AVRProg::updi_get_device_info() {
-	VERBOSE("_updi_get_device_info()\n");
+	DEBUG_VERBOSE("_updi_get_device_info()\n");
 	uint8_t buf[2] = {UPDI_PHY_SYNC, UPDI_KEY | UPDI_KEY_SIB | UPDI_SIB_16BYTES};
 	uint8_t recv[16]; // buffer for received data; reused multiple times
 	AVRDEBUG("SIB %02X %02X\n", buf[0], buf[1]);
@@ -829,7 +831,7 @@ bool Adafruit_AVRProg::updi_get_device_info() {
 	updi_chip_data_init_info(0x00, NULL, true);	// clear out any prior data
 
 	if (!updi_serial_send_receive(buf, 2, recv, 16)) {
-		VERBOSE("device info recv error\n");
+		DEBUG_VERBOSE("device info recv error\n");
 	} else {
 		for (uint8_t i = 0; i < 7; i++)
 			g_updi.details.family[i] = recv[i];
@@ -839,7 +841,7 @@ bool Adafruit_AVRProg::updi_get_device_info() {
 			g_updi.details.ocd_version[i - 11] = recv[i];
 		g_updi.details.dbg_osc_freq = recv[15];
 
-		VERBOSE("Chip Family: %s\n", g_updi.details.family);
+		DEBUG_VERBOSE("Chip Family: %s\n", g_updi.details.family);
 
 		// if we are in program mode we can get additional details
 		// the SIGROW address starts with 3 bytes which hold the chip type (always starts with 0x1E
@@ -856,7 +858,7 @@ bool Adafruit_AVRProg::updi_get_device_info() {
 
 			// our data lookup uses the 16 bit value of the chip type (ignoring the leading 0x1E)
 			uint16_t signature = ((recv[1] << 8) + recv[2]);
-			VERBOSE("Chip signature: %04X\n", signature);
+			DEBUG_VERBOSE("Chip signature: %04X\n", signature);
 			updi_chip_data_init_info(signature, NULL, false);
 
 			updi_read_data(AVR_SYSCFG_ADDRESS, recv, 1);
@@ -881,27 +883,27 @@ bool Adafruit_AVRProg::updi_get_device_info() {
 
 //Does a chip erase using the NVM controller Note that on locked devices this it not possible and the ERASE KEY has to be used instead
 bool Adafruit_AVRProg::updi_erase_chip() {
-	VERBOSE("ERASING CHIP...\n");
+	DEBUG_VERBOSE("ERASING CHIP...\n");
 
 	//Wait until NVM CTRL is ready to erase
 	if (!updi_wait_flash_ready()) {
-		VERBOSE("in updi_erase_chip() error: timeout waiting for flash ready before erase\n");
+		DEBUG_VERBOSE("in updi_erase_chip() error: timeout waiting for flash ready before erase\n");
 		return false;
 	}
 
 	//Erase
 	if (!updi_execute_nvm_command(UPDI_NVMCTRL_CTRLA_updi_erase_chip)) {
-		VERBOSE("in updi_erase_chip() error: execute_nvm_command() failed()\n");
+		DEBUG_VERBOSE("in updi_erase_chip() error: execute_nvm_command() failed()\n");
 		return false;
 	}
 
 	//Wait to finish
 	if (!updi_wait_flash_ready()) {
-		VERBOSE("in updi_erase_chip() error: timeout waiting for flash ready after erase\n");
+		DEBUG_VERBOSE("in updi_erase_chip() error: timeout waiting for flash ready after erase\n");
 		return false;
 	}
 
-	VERBOSE("ERASED\n");
+	DEBUG_VERBOSE("ERASED\n");
 
 	return true;
 }
@@ -910,10 +912,10 @@ bool Adafruit_AVRProg::updi_erase_chip() {
 
 //Reads one fuse value
 uint8_t Adafruit_AVRProg::updi_read_fuse(uint8_t fuse) {
-	VERBOSE("updi_read_fuse(%d)\n", fuse);
+	DEBUG_VERBOSE("updi_read_fuse(%d)\n", fuse);
 
 	if (!updi_is_prog_mode()) {
-		VERBOSE("in updi_read_fuse() error: not in prog mode\n");
+		DEBUG_VERBOSE("in updi_read_fuse() error: not in prog mode\n");
 		return 0;
 	}
 
@@ -925,38 +927,80 @@ bool Adafruit_AVRProg::updi_write_fuse(uint8_t fuse, uint8_t value) {
 	uint8_t data;
 
 	if (!updi_is_prog_mode()) {
-		VERBOSE("in updi_write_fuse() error: not in prog mode\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: not in prog mode\n");
 		return false;
 	}
 
 	if (!updi_wait_flash_ready()) {
-		VERBOSE("in updi_write_fuse() error: cant wait flash ready\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: cant wait flash ready\n");
 		return false;
 	}
 
 	data = (AVR_FUSE_BASE + fuse) & 0xff;
 	if (!updi_write_data(AVR_NVM_ADDRESS + UPDI_NVMCTRL_ADDRL, &data, 1)) {
-		VERBOSE("in updi_write_fuse() error: write data fail\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: write data fail\n");
 		return false;
 	}
 
 	data = (AVR_FUSE_BASE + fuse) >> 8;
 	if (!updi_write_data(AVR_NVM_ADDRESS + UPDI_NVMCTRL_ADDRH, &data, 1)) {
-		VERBOSE("in updi_write_fuse() error: write data fail\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: write data fail\n");
 		return false;
 	}
 
 	if (!updi_write_data(AVR_NVM_ADDRESS + UPDI_NVMCTRL_DATAL, &value, 1)) {
-		VERBOSE("in updi_write_fuse() error: write data fail\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: write data fail\n");
 		return false;
 	}
 
 	data = UPDI_NVMCTRL_CTRLA_UPDI_WRITE_FUSE;
 	if (!updi_write_data(AVR_NVM_ADDRESS + UPDI_NVMCTRL_CTRLA, &data, 1)) {
-		VERBOSE("in updi_write_fuse() error: write data fail\n");
+		DEBUG_VERBOSE("in updi_write_fuse() error: write data fail\n");
 		return false;
 	}
 
+	return true;
+}
+
+
+//read address space - the 'save' flag tells us if we need to save the contents to the buffer or compare the contents to the buffer
+bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t pagesize, uint8_t *pagedata) {
+	if (!updi_is_prog_mode()) {
+		DEBUG_VERBOSE("dump_flash() error: not in prog mode\n");
+		return false;
+	}
+	if (pagesize > AVR_PAGESIZE_MAX) {
+		Serial.printf("Chip pagesize %d bytes exceeds %s byte maximum\n", pagesize, AVR_PAGESIZE_MAX);
+		return false;
+	}
+    address = address - (address % pagesize); // round down to a page address
+    Serial.printf("Reading %d bytes from 0x%x", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
+
+    uint8_t err_count = 0;
+    bool success = false;
+    while (!success) {
+      success = updi_read_data(address, pagedata, pagesize);
+      
+      if (!success) {
+        err_count++;
+        DEBUG_VERBOSE("read words error at 0x%04X\n", address);
+        if (err_count > 4) { // too many consecutive errors
+          Serial.printf(" Failed at %d bytes\n", address);
+          return false;
+        }
+        continue;
+      }
+
+      err_count = 0;
+      
+      for (uint32_t j = 0; j < pagesize; j++) {
+        AVRDEBUG("%02X ", pagedata[j]);
+      }
+      AVRDEBUG("\n");
+    }
+    
+	Serial.println("\nSuccess");
+    
 	return true;
 }
 
@@ -1009,7 +1053,7 @@ DeviceIdentification *Adafruit_AVRProg::updi_chip_lookup(uint16_t sig, char *nam
 	for (uint8_t i = 0; i < max; i++) {
 		if (sig) {
 			if (g_updi_devices[i].signature == sig) {
-				VERBOSE("Found Chip %s\n", g_updi_devices[i].longname);
+				DEBUG_VERBOSE("Found Chip %s\n", g_updi_devices[i].longname);
 				return &g_updi_devices[i];
 			}
 		} else if (name && name[0]) {
@@ -1033,19 +1077,19 @@ bool Adafruit_AVRProg::updi_read_data(uint32_t address, uint8_t *buf, uint32_t s
 
 	//Range updi_check
 	if (size > UPDI_MAX_REPEAT_SIZE + 1) {
-		VERBOSE("read_data error: cant read that many bytes at once\n");
+		DEBUG_VERBOSE("read_data error: cant read that many bytes at once\n");
 		return false;
 	}
 
 	if (!updi_st_ptr(address)) { //Store address pointer
-		VERBOSE("read_data() error: st_ptr()\n");
+		DEBUG_VERBOSE("read_data() error: st_ptr()\n");
 		return false;
 	}
 	if (size > 1)
 		updi_set_repeat(size); //Set repeat
 
 	if (!updi_ld_ptr_inc(buf, size)) {
-		VERBOSE("updi_read_data(): ld_ptr_inc error\n");
+		DEBUG_VERBOSE("updi_read_data(): ld_ptr_inc error\n");
 		return false;
 	}
 
@@ -1057,35 +1101,35 @@ bool Adafruit_AVRProg::updi_read_data(uint32_t address, uint8_t *buf, uint32_t s
 bool Adafruit_AVRProg::updi_write_data(uint32_t address, uint8_t *data, uint32_t len) {
 	if (len == 1) {
 		if (!updi_st(address, data[0])) {
-			VERBOSE("in _updi_write_data() error: st ret false\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: st ret false\n");
 			return false;
 		}
 	} else if (len == 2) {
 		if (!updi_st(address, data[0])) {
-			VERBOSE("in _updi_write_data() error: st ret false\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: st ret false\n");
 			return false;
 		}
 		if (!updi_st(address + 1, data[1])) {
-			VERBOSE("in _updi_write_data() error: st ret false\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: st ret false\n");
 			return false;
 		}
 	} else {
 		//Range updi_check
 		if (len > UPDI_MAX_REPEAT_SIZE + 1) {
-			VERBOSE("in _updi_write_data() error: invalid length\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: invalid length\n");
 			return false;
 		}
 
 		//store address
 		if (!updi_st_ptr(address)) {
-			VERBOSE("in _updi_write_data() error: couldnt st_ptr(address)\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: couldnt st_ptr(address)\n");
 			return false;
 		}
 
 		//set up repeat
 		updi_set_repeat(len);
 		if (!updi_st_ptr_inc(data, len)) {
-			VERBOSE("in _updi_write_data() error: couldnt st_ptr_inc() error\n");
+			DEBUG_VERBOSE("in _updi_write_data() error: couldnt st_ptr_inc() error\n");
 			return false;
 		}
 	}
@@ -1096,7 +1140,7 @@ bool Adafruit_AVRProg::updi_write_data(uint32_t address, uint8_t *data, uint32_t
 //Execute NVM command
 bool Adafruit_AVRProg::updi_execute_nvm_command(uint8_t command) {
 	if (!updi_st(AVR_NVM_ADDRESS + UPDI_NVMCTRL_CTRLA, command)) {
-		VERBOSE("in execute_nvm_command() error: st() false return\n");
+		DEBUG_VERBOSE("in execute_nvm_command() error: st() false return\n");
 		return false;
 	}
 	return true;
@@ -1110,7 +1154,7 @@ bool Adafruit_AVRProg::updi_wait_flash_ready() {
 	while (millis() < end) {
 		uint8_t status = updi_ld(AVR_NVM_ADDRESS + UPDI_NVMCTRL_STATUS);
 		if (status & (1 << UPDI_NVM_STATUS_UPDI_WRITE_ERROR)) {
-			VERBOSE("in wait_flash_ready() error: nvm error\n");
+			DEBUG_VERBOSE("in wait_flash_ready() error: nvm error\n");
 			return false;
 		}
 
@@ -1119,6 +1163,6 @@ bool Adafruit_AVRProg::updi_wait_flash_ready() {
 		}
 	}
 
-	VERBOSE("in wait_flash_ready() error: wait flash ready timed out\n");
+	DEBUG_VERBOSE("in wait_flash_ready() error: wait flash ready timed out\n");
 	return false;
 }

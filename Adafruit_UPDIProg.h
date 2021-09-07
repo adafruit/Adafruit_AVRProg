@@ -8,7 +8,7 @@
 #define AVRDEBUG(fmt, ...)	{Serial.print("\t[AVR]\t"); Serial.printf(fmt, ##__VA_ARGS__);}
 #define DEBUG(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
 #define DEBUG_TASK(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
-#define VERBOSE(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
+#define DEBUG_VERBOSE(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
 //#define DEBUG_PHYSICAL(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
 #define DEBUG_PHYSICAL(fmt, ...)
 

@@ -13,7 +13,7 @@
 #define FUSE_HIGH 2 ///< High fuse
 #define FUSE_EXT 3  ///< Extended fuse
 
-//#define VERBOSE 2
+#define VERBOSE 2
 
 #define FUSE_CLOCKSPEED 10000    ///< Fuses need to be programmed slowly
 #define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
@@ -52,8 +52,11 @@ public:
 
   void pulseLED(int pin, int times);
   void eraseChip(void);
+
+  bool readFuses(byte *fuses, uint8_t numbytes);
   bool programFuses(const byte *fuses);
   bool verifyFuses(const byte *fuses, const byte *fusemask);
+
   bool writeImage(const byte *hextext, uint8_t pagesize, uint32_t chipsize);
   bool verifyImage(const byte *hextext);
 
@@ -90,7 +93,8 @@ public:
   void updi_serial_force_break(void);
   bool updiIsConnected(bool silent);
   bool updi_init(bool force);
-  void updi_run_tasks(uint16_t tasks, uint8_t* data);
+  void updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
+
   bool updi_wait_flash_ready();
   bool updi_execute_nvm_command(uint8_t command);
 
@@ -106,6 +110,9 @@ public:
 
   bool updi_write_fuse(uint8_t fuse, uint8_t value);
   uint8_t updi_read_fuse(uint8_t fuse);
+
+  bool updi_read_page(uint16_t address, uint16_t pagesize, uint8_t *data);
+
   bool updi_erase_chip();
   void updi_write_key(uint8_t size, uint8_t *key);
   bool updi_chip_data_init_info(uint16_t sig, char *shortname, bool format);
