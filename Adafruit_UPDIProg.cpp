@@ -946,22 +946,22 @@ bool Adafruit_AVRProg::updi_write_fuse(uint8_t fuse, uint8_t value) {
 }
 
 
-bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t pagesize, uint8_t *pagedata) {
+bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t bufsize, uint8_t *bufdata) {
 	if (!updi_is_prog_mode()) {
 		DEBUG_VERBOSE("dump_flash() error: not in prog mode\n");
 		return false;
 	}
-	if (pagesize > AVR_PAGESIZE_MAX) {
-		Serial.printf("Chip pagesize %d bytes exceeds %s byte maximum\n", pagesize, AVR_PAGESIZE_MAX);
+	if (bufsize > AVR_PAGESIZE_MAX) {
+		Serial.printf("Chip buffer %d bytes exceeds %s byte maximum\n", bufsize, AVR_PAGESIZE_MAX);
 		return false;
 	}
-    address = address - (address % pagesize); // round down to a page address
-    Serial.printf("Reading %d bytes from 0x%x\n", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
+    //address = address - (address % pagesize); // round down to a page address
+    Serial.printf("Reading %d bytes from 0x%x\n", bufsize, address); // deliberately no LF; the start + progress + finish messages are all combined
 
     uint8_t err_count = 0;
     bool success = false;
     while (!success) {
-      success = updi_read_data(address, pagedata, pagesize);
+      success = updi_read_data(address, bufdata, bufsize);
       
       if (!success) {
         err_count++;
@@ -974,8 +974,8 @@ bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t pagesize, uint8
       }
       err_count = 0;
       
-      for (uint32_t j = 0; j < pagesize; j++) {
-        AVRDEBUG("%02X ", pagedata[j]);
+      for (uint32_t j = 0; j < bufsize; j++) {
+        AVRDEBUG("%02X ", bufdata[j]);
       }
       AVRDEBUG("\n");
     }

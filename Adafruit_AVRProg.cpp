@@ -374,7 +374,7 @@ boolean Adafruit_AVRProg::verifyFuses(const byte *fuses, const byte *fusemask) {
     @return True if flashing worked out, check the data with verifyImage!
 */
 /**************************************************************************/
-bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
+bool Adafruit_AVRProg::writeImage(const byte *hextext, uint16_t pagesize,
                                   uint32_t chipsize) {
   uint16_t pageaddr = 0;
 
@@ -390,7 +390,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
         readImagePage(hextext, pageaddr, pagesize, pageBuffer);
 
     bool blankpage = true;
-    for (uint8_t i = 0; i < pagesize; i++) {
+    for (uint16_t i = 0; i < pagesize; i++) {
       if (pageBuffer[i] != 0xFF)
         blankpage = false;
     }
@@ -412,16 +412,16 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint8_t pagesize,
  */
 
 const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
-                                            uint16_t pageaddr, uint8_t pagesize,
+                                            uint16_t pageaddr, uint16_t pagesize,
                                             byte *page) {
   uint16_t len;
-  uint8_t page_idx = 0;
+  uint16_t page_idx = 0;
   const byte *beginning = hextext;
 
   byte b, cksum = 0;
 
   // 'empty' the page by filling it with 0xFF's
-  for (uint8_t i = 0; i < pagesize; i++)
+  for (uint16_t i = 0; i < pagesize; i++)
     page[i] = 0xFF;
 
   while (1) {
@@ -532,26 +532,27 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
 bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
   if (uart) {
     uint32_t pageaddr = 0;
-    uint16_t pagesize = g_updi.config->flash_pagesize, 
-      chipsize = g_updi.config->flash_size;
-    uint8_t buffer2[pagesize];
+    uint16_t pagesize = g_updi.config->flash_pagesize;
+    uint16_t buffersize = AVR_PAGESIZE_MAX;
+    uint16_t chipsize = g_updi.config->flash_size;
+    uint8_t buffer2[buffersize];
 
 #if VERBOSE
     Serial.print("Chip size: ");
     Serial.println(chipsize, DEC);
-    Serial.print("Page size: ");
-    Serial.println(pagesize, DEC);
+    Serial.print("Buffer size: ");
+    Serial.println(buffersize, DEC);
 #endif
 
     while ((pageaddr < chipsize) && hextext) {
       const byte *hextextpos =
-        readImagePage(hextext, pageaddr, pagesize, pageBuffer);
+        readImagePage(hextext, pageaddr, buffersize, pageBuffer);
       
-      if (! updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, pagesize)) {
+      if (! updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, buffersize)) {
         return false;
       }
       
-      for (uint8_t i = 0; i < pagesize; i++) {
+      for (uint16_t i = 0; i < buffersize; i++) {
         if (pageBuffer[i] != buffer2[i]) {
           Serial.print(F("Verification error at address 0x"));
           Serial.print(pageaddr + i, HEX);
@@ -560,14 +561,14 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
           Serial.print(F(" not 0x"));
           Serial.println(buffer2[i], HEX);
           Serial.println("----");
-          for (uint8_t i = 0; i < pagesize; i++) {
+          for (uint16_t i = 0; i < buffersize; i++) {
             Serial.printf("0x%02X, ", pageBuffer[i]);
             if ((i % 16) == 15) {
               Serial.println();
             }
           }
           Serial.println("vs.");
-          for (uint8_t i = 0; i < pagesize; i++) {
+          for (uint16_t i = 0; i < buffersize; i++) {
             Serial.printf("0x%02X, ", buffer2[i]);
             if ((i % 16) == 15) {
               Serial.println();
@@ -578,7 +579,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         }
       }
       hextext = hextextpos;
-      pageaddr += pagesize;
+      pageaddr += buffersize;
     }
   } else {
     startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
@@ -693,12 +694,12 @@ bool Adafruit_AVRProg::flashWord(uint8_t hilo, uint16_t addr, uint8_t data) {
 
 // Basically, write the pagebuff (with pagesize bytes in it) into page $pageaddr
 bool Adafruit_AVRProg::flashPage(byte *pagebuff, uint16_t pageaddr,
-                                 uint8_t pagesize) {
+                                 uint16_t pagesize) {
   Serial.print(F("Flashing page "));
   Serial.println(pageaddr, HEX);
 
 #if VERBOSE
-  for (uint8_t i = 0; i < pagesize; i++) {
+  for (uint16_t i = 0; i < pagesize; i++) {
     if (pagebuff[i] <= 0xF) 
       Serial.print('0');
     Serial.print(pagebuff[i], HEX);
@@ -885,11 +886,11 @@ uint8_t Adafruit_AVRProg::internalRcCalibration() {
  @return True if flashing worked out.
  */
 /**************************************************************************/
-bool Adafruit_AVRProg::writeByteToFlash(unsigned int addr, uint8_t pagesize,
+bool Adafruit_AVRProg::writeByteToFlash(unsigned int addr, uint16_t pagesize,
                                         uint8_t content) {
   // calculate page number and offset.
   memset(pageBuffer, 0xFF, pagesize);
-  uint8_t pageOffset = addr & (pagesize - 1);
+  uint16_t pageOffset = addr & (pagesize - 1);
   pageBuffer[pageOffset] = content;
   return flashPage(pageBuffer, addr, pagesize);
 }

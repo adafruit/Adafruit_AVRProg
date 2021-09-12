@@ -57,7 +57,7 @@ public:
   bool programFuses(const byte *fuses);
   bool verifyFuses(const byte *fuses, const byte *fusemask);
 
-  bool writeImage(const byte *hextext, uint8_t pagesize, uint32_t chipsize);
+  bool writeImage(const byte *hextext, uint16_t pagesize, uint32_t chipsize);
   bool verifyImage(const byte *hextext);
 
   void setSPI(int8_t reset_pin, SPIClass *theSPI = &SPI);
@@ -131,7 +131,7 @@ public:
   void setErrorLED(uint8_t led) { errLED = led; }
   void generateClock(void);
   uint8_t internalRcCalibration();
-  bool writeByteToFlash(unsigned int addr, uint8_t pagesize, uint8_t content);
+  bool writeByteToFlash(unsigned int addr, uint16_t pagesize, uint8_t content);
 
   bool targetPower(bool poweron);
   uint16_t readSignature(void);
@@ -147,11 +147,11 @@ private:
   uint8_t transfer(uint8_t out);
   void busyWait(void);
 
-  bool flashPage(byte *pagebuff, uint16_t pageaddr, uint8_t pagesize);
+  bool flashPage(byte *pagebuff, uint16_t pageaddr, uint16_t pagesize);
   bool flashWord(uint8_t hilo, uint16_t addr, uint8_t data);
   int8_t readByteEEPROM(unsigned int addr);
   const byte *readImagePage(const byte *hextext, uint16_t pageaddr,
-                            uint8_t pagesize, byte *page);
+                            uint16_t pagesize, byte *page);
   byte hexToByte(byte h);
 
   int8_t _reset = -1, _mosi = -1, _miso = -1, _sck = -1;
