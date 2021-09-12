@@ -464,18 +464,18 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
 			updi_init(false);	// re-init the UPDI interface
 
 			if (!updi_check()) {
-				DEBUG_TASK("Cannot initialise UPDI, aborting.\n");
+				DEBUG_PHYSICAL("Cannot initialise UPDI, aborting.\n");
 				// TODO find out why these are not already correct
 				g_updi.initialized = false;
 				g_updi.unlocked = false;
                 success = false;
 				break;
 			} else {
-				DEBUG_TASK("UPDI INITIALISED\n");
+				DEBUG_PHYSICAL("UPDI INITIALISED\n");
 				g_updi.initialized = true;
 			}
 		} else {
-			DEBUG_TASK("UPDI ALREADY INITIALISED\n");
+          DEBUG_PHYSICAL("UPDI ALREADY INITIALISED\n");
 			g_updi.initialized = true;
 		}
 
@@ -506,7 +506,7 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
 				break;
 			}
 		} else {
-            DEBUG_TASK("IN PROG MODE EASY\n");
+            DEBUG_PHYSICAL("IN PROG MODE EASY\n");
 			g_updi.unlocked = true;
 		}
 
@@ -956,7 +956,7 @@ bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t pagesize, uint8
 		return false;
 	}
     address = address - (address % pagesize); // round down to a page address
-    Serial.printf("Reading %d bytes from 0x%x", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
+    Serial.printf("Reading %d bytes from 0x%x\n", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
 
     uint8_t err_count = 0;
     bool success = false;
@@ -980,7 +980,7 @@ bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t pagesize, uint8
       AVRDEBUG("\n");
     }
     
-	Serial.println("\nSuccess");
+	//Serial.println("\nSuccess");
 	return true;
 }
 

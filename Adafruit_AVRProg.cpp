@@ -441,7 +441,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     len = hexToByte(pgm_read_byte(hextext++));
     len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
     cksum = len;
-    Serial.print(len);
+    //Serial.print(len);
 
     // read high address byte
     b = hexToByte(pgm_read_byte(hextext++));
