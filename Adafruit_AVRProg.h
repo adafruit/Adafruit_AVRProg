@@ -13,7 +13,7 @@
 #define FUSE_HIGH 2 ///< High fuse
 #define FUSE_EXT 3  ///< Extended fuse
 
-#define VERBOSE 2
+//#define VERBOSE 1
 
 #define FUSE_CLOCKSPEED 10000    ///< Fuses need to be programmed slowly
 #define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
@@ -51,7 +51,7 @@ public:
   Adafruit_AVRProg();
 
   void pulseLED(int pin, int times);
-  void eraseChip(void);
+  bool eraseChip(void);
 
   bool readFuses(byte *fuses, uint8_t numbytes);
   bool programFuses(const byte *fuses);
@@ -81,6 +81,7 @@ public:
   bool updi_ld_ptr_inc(uint8_t *buffer, uint16_t size);
 
   bool updi_write_data(uint32_t address, uint8_t *data, uint32_t len);
+  bool updi_write_data_words(uint32_t address, uint8_t *data, uint32_t numwords);
   bool updi_read_data(uint32_t address, uint8_t *buf, uint32_t size);
 
   void updi_st_ptr_inc16(uint8_t *data, uint32_t numwords);
@@ -93,9 +94,10 @@ public:
   void updi_serial_force_break(void);
   bool updiIsConnected(bool silent);
   bool updi_init(bool force);
-  void updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
+  bool updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
 
   bool updi_wait_flash_ready();
+  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess);
   bool updi_execute_nvm_command(uint8_t command);
 
   void updi_apply_reset();
@@ -112,6 +114,7 @@ public:
   uint8_t updi_read_fuse(uint8_t fuse);
 
   bool updi_read_page(uint16_t address, uint16_t pagesize, uint8_t *data);
+  bool updi_write_page(uint16_t address, uint16_t pagesize, uint8_t *pagedata);
 
   bool updi_erase_chip();
   void updi_write_key(uint8_t size, uint8_t *key);
