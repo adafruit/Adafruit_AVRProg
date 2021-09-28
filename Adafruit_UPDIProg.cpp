@@ -1,6 +1,8 @@
 #include "Adafruit_UPDIProg.h"
 #include "Adafruit_AVRProg.h"
 
+#if SUPPORT_UPDI
+
 DeviceIdentification g_updi_devices[] = {
 	//	signature, short id, descriptive name, config
 	{0x9123, "t202", "ATtiny202", AVR8X_TINY_2X},
@@ -53,7 +55,7 @@ void Adafruit_AVRProg::updi_serial_init() {
   _updi_serial_retry_count = 0;
 
   uart->begin(_baudrate, SERIAL_8E2);
-  uart->setTimeout(50);
+  uart->setTimeout(10);
   DEBUG_PHYSICAL("updi serial init set\n");
 
   _updi_serial_inited = true;
@@ -573,12 +575,21 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
           }
 
           while (remainingsize > 0) {
-            if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true, false)) {
-              //Serial.println("Writing flash failed");
-              success = false;
-              break;
-            } else {
-              //Serial.println("Flash written\n");
+            bool page_blank = true;
+            for (uint32_t p=0; p<flashpagesize; p++) {
+              if (data[p] != 0xFF) {
+                page_blank = false;
+                break;
+              }
+            }
+            if (! page_blank) {
+              if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true, false)) {
+                //Serial.println("Writing flash failed");
+                success = false;
+                break;
+              } else {
+                //Serial.println("Flash written\n");
+              }
             }
             remainingsize -= flashpagesize;
             address += flashpagesize;
@@ -1216,7 +1227,7 @@ bool Adafruit_AVRProg::updi_wait_flash_ready() {
 
 
 //Writes a page of data to NVM. By default the PAGE_WRITE command is used, which requires that the page is already erased. By default word access is used (flash)
-bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash) {
+bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash, bool verify) {
   uint32_t t = millis();
 
 	//wait for NVM controller to be ready
@@ -1224,7 +1235,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		DEBUG_VERBOSE("in updi_write_nvm() error: cant wait flash ready\n");
 		return false;
 	}
-    Serial.printf("wait flash 1: %d ms\n", millis()-t); t = millis();
+    //Serial.printf("wait flash 1: %d ms\n", millis()-t); t = millis();
 
 	//Clear page buffer
 	if (!updi_execute_nvm_command(UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR)) {
@@ -1232,7 +1243,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		return false;
 	}
 
-    Serial.printf("clear page: %d ms\n", millis()-t); t = millis();
+    //Serial.printf("clear page: %d ms\n", millis()-t); t = millis();
 
 	//wait for NVM controller to be ready
 	if (!updi_wait_flash_ready()) {
@@ -1240,7 +1251,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		return false;
 	}
 
-    Serial.printf("wait flash 2: %d ms\n", millis()-t); t = millis();
+    //Serial.printf("wait flash 2: %d ms\n", millis()-t); t = millis();
 
 	//Load the page buffer by writing directly to location
 	// FYI: word access is significantly faster for write but no faster for read
@@ -1256,7 +1267,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		}
 	}
 
-    Serial.printf("write page: %d ms\n", millis()-t); t = millis();
+    //Serial.printf("write page: %d ms\n", millis()-t); t = millis();
 
 	//Write the page to NVM, maybe erase first
 	if (!updi_execute_nvm_command(command)) {
@@ -1264,7 +1275,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		return false;
 	}
 
-    Serial.printf("nvm write: %d ms\n", millis()-t); t = millis();
+    //Serial.printf("nvm write: %d ms\n", millis()-t); t = millis();
 
     if (block_on_flash) {
       //wait for NVM controller to be ready
@@ -1273,7 +1284,22 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		return false;
       }
 
-      Serial.printf("wait flash 3: %d ms\n", millis()-t); t = millis();
+      //Serial.printf("wait flash 3: %d ms\n", millis()-t); t = millis();
+    } 
+    if (verify) {
+      uint8_t readbuf[len];
+      if (! updi_read_data(address, readbuf, len)) {
+        return false;
+      }
+      //Serial.printf("read buf: %d ms\n", millis()-t); t = millis();
+      for (uint16_t b=0; b<len; b++) {
+        if (readbuf[b] != data[b]) {
+          Serial.println("Verification error!");
+          return false;
+        }
+      }
     }
+
 	return true;
 }
+#endif

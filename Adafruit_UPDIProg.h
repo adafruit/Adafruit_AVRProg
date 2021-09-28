@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+#if !defined(__AVR__)
+  #define SUPPORT_UPDI
+#endif
 
 
 //#define AVRDEBUG(fmt, ...)	{Serial.print("\t[AVR]\t"); Serial.printf(fmt, ##__VA_ARGS__);}
@@ -210,8 +213,5 @@ typedef struct {
 	DeviceDetails details; // this is data read from device
 	uint8_t fuses[AVR_NUM_FUSES];
 } UPDI;
-
-
-
 
 #endif

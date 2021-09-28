@@ -57,7 +57,7 @@ public:
   bool programFuses(const byte *fuses);
   bool verifyFuses(const byte *fuses, const byte *fusemask);
 
-  bool writeImage(const byte *hextext, uint16_t pagesize, uint32_t chipsize);
+  bool writeImage(const byte *hextext, uint32_t pagesize, uint32_t chipsize);
   bool verifyImage(const byte *hextext);
 
   void setSPI(int8_t reset_pin, SPIClass *theSPI = &SPI);
@@ -65,6 +65,7 @@ public:
               int8_t miso_pin);
 
   void setUPDI(HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin = -1);
+#ifdef SUPPORT_UPDI
   void updi_serial_init(void);
   int updi_serial_read_wait(void);
   bool updi_serial_send(uint8_t *data, uint16_t size);
@@ -97,7 +98,7 @@ public:
   bool updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
 
   bool updi_wait_flash_ready();
-  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash=true);
+  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash=true, bool verify=true);
   bool updi_execute_nvm_command(uint8_t command);
 
   void updi_apply_reset();
@@ -120,6 +121,7 @@ public:
   void updi_write_key(uint8_t size, uint8_t *key);
   bool updi_chip_data_init_info(uint16_t sig, char *shortname, bool format);
   DeviceIdentification *updi_chip_lookup(uint16_t sig, char *name);
+#endif
 
   /*!
     @brief  Set up a GPIO as a programming-indicator LED
@@ -163,10 +165,12 @@ private:
   HardwareSerial *uart = NULL;
   int8_t _power = -1;
   uint32_t _baudrate;
+#ifdef SUPPORT_UPDI
   uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
   uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
   bool _updi_serial_inited = false;
   UPDI g_updi;
+#endif
 };
 
 #endif
