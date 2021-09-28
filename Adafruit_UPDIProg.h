@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 
-#if !defined(__AVR__)
+#if defined(__AVR__) || (defined(ARDUINO_ARCH_SAMD) && !defined(ARDUINO_SAMD_ADAFRUIT))
+  #pragma message "UPDI Support NOT included"
+#else
   #define SUPPORT_UPDI
 #endif
 

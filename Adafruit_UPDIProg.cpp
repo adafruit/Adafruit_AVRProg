@@ -1,7 +1,7 @@
 #include "Adafruit_UPDIProg.h"
 #include "Adafruit_AVRProg.h"
 
-#if SUPPORT_UPDI
+#ifdef SUPPORT_UPDI
 
 DeviceIdentification g_updi_devices[] = {
 	//	signature, short id, descriptive name, config

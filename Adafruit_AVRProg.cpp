@@ -253,10 +253,11 @@ bool Adafruit_AVRProg::eraseChip(void) {
 */
 /**************************************************************************/
 bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
+  (void)fuses[0];
+  (void)numbytes;
+  
   if (uart) {
 #ifndef SUPPORT_UPDI
-    (void *)fuses;
-    (void)numbytes;
     return false; // not supported on this platform :(
 #else
     if (! updi_run_tasks(UPDI_TASK_READ_FUSES, NULL)) {
