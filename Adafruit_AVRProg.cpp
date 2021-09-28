@@ -56,8 +56,8 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
     @brief  Set up programming to use UPDI interface
     @param  theSerial Hardware serial interface (CANNOT use software serial!)
     @param  baudrate Try 115200 or less to start
-    @param  power_pin pin connected to chip power (can help with UPDI since
-    theres no reset line)
+    @param  power_pin pin connected to target chip power (can help with UPDI
+   since theres no reset line)
 */
 /**************************************************************************/
 void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate,
