@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['image_5fchipname',['image_chipname',['../structimage.html#abd02a450b996b0cd582977092fb410aa',1,'image']]],
-  ['image_5fchipsig',['image_chipsig',['../structimage.html#aa607361d850f52a93bf7126f3b7fab53',1,'image']]],
-  ['image_5fhexcode',['image_hexcode',['../structimage.html#a8b800ae6e72ee6f988d2f97a4545cc55',1,'image']]],
-  ['image_5fname',['image_name',['../structimage.html#ae93f4dfe1efb34bbf94b8c26c6ee1c91',1,'image']]],
-  ['image_5fnormfuses',['image_normfuses',['../structimage.html#a3be228290a0cf33bf76c0ffe1e6ad53b',1,'image']]],
-  ['image_5fpagesize',['image_pagesize',['../structimage.html#a0d2c1bad81300e1297731d5295beea60',1,'image']]],
-  ['image_5fprogfuses',['image_progfuses',['../structimage.html#a886607fda3b6975b0c0c7dffb13c78ea',1,'image']]]
+  ['eeprom_5fpagesize',['eeprom_pagesize',['../struct_device_configuration.html#ab474cf75e34cbfb2b860393723585934',1,'DeviceConfiguration']]],
+  ['eeprom_5fsize',['eeprom_size',['../struct_device_configuration.html#aad0a12dd1eca05a7fb217abfd5ee90f1',1,'DeviceConfiguration']]],
+  ['error_5f16v3',['error_16v3',['../struct_device_details.html#a5a13ac3ea5c862b7cb6a9333a863f068',1,'DeviceDetails']]],
+  ['error_5f16v5',['error_16v5',['../struct_device_details.html#aa8600085bc1e634183b314260daf2feb',1,'DeviceDetails']]],
+  ['error_5f20v3',['error_20v3',['../struct_device_details.html#a905d9cc4b259ea07bbe30c1f2fea96ec',1,'DeviceDetails']]],
+  ['error_5f20v5',['error_20v5',['../struct_device_details.html#aa9d0aba2519e07b04e90a46b0cfa22a6',1,'DeviceDetails']]]
 ];

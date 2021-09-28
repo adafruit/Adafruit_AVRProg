@@ -80,28 +80,33 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0625671abbc02bbba22557dc3c3b4c6d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a0625671abbc02bbba22557dc3c3b4c6d">pulseLED</a> (int pin, int times)</td></tr>
 <tr class="memdesc:a0625671abbc02bbba22557dc3c3b4c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn a pin on and off a few times; indicates life via LED.  <a href="#a0625671abbc02bbba22557dc3c3b4c6d">More...</a><br /></td></tr>
 <tr class="separator:a0625671abbc02bbba22557dc3c3b4c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae57fdbcbe8dc171fed9c0440a8c85e29"><td class="memItemLeft" align="right" valign="top"><a id="ae57fdbcbe8dc171fed9c0440a8c85e29"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ae57fdbcbe8dc171fed9c0440a8c85e29">eraseChip</a> (void)</td></tr>
-<tr class="memdesc:ae57fdbcbe8dc171fed9c0440a8c85e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the erase command, then busy wait until the chip is erased. <br /></td></tr>
-<tr class="separator:ae57fdbcbe8dc171fed9c0440a8c85e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13311473bb0e9192a640c5a5f824094a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a13311473bb0e9192a640c5a5f824094a">eraseChip</a> (void)</td></tr>
+<tr class="memdesc:a13311473bb0e9192a640c5a5f824094a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the erase command, then busy wait until the chip is erased.  <a href="#a13311473bb0e9192a640c5a5f824094a">More...</a><br /></td></tr>
+<tr class="separator:a13311473bb0e9192a640c5a5f824094a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6bd8595158b4439f5901eb648e0d8d2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ae6bd8595158b4439f5901eb648e0d8d2">readFuses</a> (byte *fuses, uint8_t numbytes)</td></tr>
+<tr class="memdesc:ae6bd8595158b4439f5901eb648e0d8d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the fuses on a device.  <a href="#ae6bd8595158b4439f5901eb648e0d8d2">More...</a><br /></td></tr>
+<tr class="separator:ae6bd8595158b4439f5901eb648e0d8d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a667fa9e374ab3ad0d8cb20c1ffc1fd37">programFuses</a> (const byte *fuses)</td></tr>
 <tr class="memdesc:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the fuses on a device.  <a href="#a667fa9e374ab3ad0d8cb20c1ffc1fd37">More...</a><br /></td></tr>
 <tr class="separator:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a934fd65ce285febcde9281d575855728"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728">verifyFuses</a> (const byte *fuses, const byte *fusemask)</td></tr>
 <tr class="memdesc:a934fd65ce285febcde9281d575855728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the fuses are set to what we expect.  <a href="#a934fd65ce285febcde9281d575855728">More...</a><br /></td></tr>
 <tr class="separator:a934fd65ce285febcde9281d575855728"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace8068e573b2ae49b7b9ceac27391389"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ace8068e573b2ae49b7b9ceac27391389">writeImage</a> (const byte *hextext, uint8_t pagesize, uint32_t chipsize)</td></tr>
-<tr class="memdesc:ace8068e573b2ae49b7b9ceac27391389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the chip flash.  <a href="#ace8068e573b2ae49b7b9ceac27391389">More...</a><br /></td></tr>
-<tr class="separator:ace8068e573b2ae49b7b9ceac27391389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9014e47745719cbcf570685c2acce7a0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a9014e47745719cbcf570685c2acce7a0">verifyImage</a> (const byte *hextext)</td></tr>
-<tr class="memdesc:a9014e47745719cbcf570685c2acce7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Does a byte-by-byte verify of the flash hex against the chip Thankfully this does not have to be done by pages!  <a href="#a9014e47745719cbcf570685c2acce7a0">More...</a><br /></td></tr>
-<tr class="separator:a9014e47745719cbcf570685c2acce7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad99bdde99a9d06689c0e7c95d8d56eb2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ad99bdde99a9d06689c0e7c95d8d56eb2">writeImage</a> (const byte *hextext, uint32_t pagesize, uint32_t chipsize)</td></tr>
+<tr class="memdesc:ad99bdde99a9d06689c0e7c95d8d56eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the chip flash.  <a href="#ad99bdde99a9d06689c0e7c95d8d56eb2">More...</a><br /></td></tr>
+<tr class="separator:ad99bdde99a9d06689c0e7c95d8d56eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab5693e13b97c7d8cd3c07a80b6b0fed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#aab5693e13b97c7d8cd3c07a80b6b0fed">verifyImage</a> (const byte *hextext)</td></tr>
+<tr class="memdesc:aab5693e13b97c7d8cd3c07a80b6b0fed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Does a byte-by-byte verify of the flash hex against the chip Thankfully this does not have to be done by pages!  <a href="#aab5693e13b97c7d8cd3c07a80b6b0fed">More...</a><br /></td></tr>
+<tr class="separator:aab5693e13b97c7d8cd3c07a80b6b0fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fa7549a22e06e1e0d8d09b292f69cfd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a7fa7549a22e06e1e0d8d09b292f69cfd">setSPI</a> (int8_t reset_pin, SPIClass *theSPI=&amp;SPI)</td></tr>
 <tr class="memdesc:a7fa7549a22e06e1e0d8d09b292f69cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure a hardware SPI interface, plus one reset pin.  <a href="#a7fa7549a22e06e1e0d8d09b292f69cfd">More...</a><br /></td></tr>
 <tr class="separator:a7fa7549a22e06e1e0d8d09b292f69cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a6fb760db5f9a1e5660bfd83e7448d20f">setSPI</a> (int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin, int8_t miso_pin)</td></tr>
 <tr class="memdesc:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure a software SPI interface, plus one reset pin.  <a href="#a6fb760db5f9a1e5660bfd83e7448d20f">More...</a><br /></td></tr>
 <tr class="separator:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cb136948a665297e165ea8f808e31f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a6cb136948a665297e165ea8f808e31f0">setUPDI</a> (HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin=-1)</td></tr>
+<tr class="memdesc:a6cb136948a665297e165ea8f808e31f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up programming to use <a class="el" href="struct_u_p_d_i.html">UPDI</a> interface.  <a href="#a6cb136948a665297e165ea8f808e31f0">More...</a><br /></td></tr>
+<tr class="separator:a6cb136948a665297e165ea8f808e31f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfdb5a9af9854ccadd458cfba2416e63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#abfdb5a9af9854ccadd458cfba2416e63">setProgramLED</a> (uint8_t led)</td></tr>
 <tr class="memdesc:abfdb5a9af9854ccadd458cfba2416e63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a GPIO as a programming-indicator LED.  <a href="#abfdb5a9af9854ccadd458cfba2416e63">More...</a><br /></td></tr>
 <tr class="separator:abfdb5a9af9854ccadd458cfba2416e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,9 +120,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:acf7e12946fe349d79846fabb9ef8e7c5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#acf7e12946fe349d79846fabb9ef8e7c5">internalRcCalibration</a> ()</td></tr>
 <tr class="memdesc:acf7e12946fe349d79846fabb9ef8e7c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">If your target chip will be running with internal RC oscillator, We can perform an calibration with the method described in AVR053. ONLY FOR AVR 'HOSTS' with a crystal oscillator, which is accurate.  <a href="#acf7e12946fe349d79846fabb9ef8e7c5">More...</a><br /></td></tr>
 <tr class="separator:acf7e12946fe349d79846fabb9ef8e7c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc33b5868126cfa0eac741fa5f409605"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#adc33b5868126cfa0eac741fa5f409605">writeByteToFlash</a> (unsigned int addr, uint8_t pagesize, uint8_t content)</td></tr>
-<tr class="memdesc:adc33b5868126cfa0eac741fa5f409605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to write a byte to certain address in flash without page erase. Useful for parameters.  <a href="#adc33b5868126cfa0eac741fa5f409605">More...</a><br /></td></tr>
-<tr class="separator:adc33b5868126cfa0eac741fa5f409605"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68d97dc5cd6dbac0b0ad80ac2b09486a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a68d97dc5cd6dbac0b0ad80ac2b09486a">writeByteToFlash</a> (unsigned int addr, uint16_t pagesize, uint8_t content)</td></tr>
+<tr class="memdesc:a68d97dc5cd6dbac0b0ad80ac2b09486a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to write a byte to certain address in flash without page erase. Useful for parameters.  <a href="#a68d97dc5cd6dbac0b0ad80ac2b09486a">More...</a><br /></td></tr>
+<tr class="separator:a68d97dc5cd6dbac0b0ad80ac2b09486a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac80fea89bca40a98524135e7839645c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ac80fea89bca40a98524135e7839645c6">targetPower</a> (bool poweron)</td></tr>
 <tr class="memdesc:ac80fea89bca40a98524135e7839645c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin/end programming, turn on/off a programming LED if we have one.  <a href="#ac80fea89bca40a98524135e7839645c6">More...</a><br /></td></tr>
 <tr class="separator:ac80fea89bca40a98524135e7839645c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,6 +173,65 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a13311473bb0e9192a640c5a5f824094a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13311473bb0e9192a640c5a5f824094a">&#9670;&nbsp;</a></span>eraseChip()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AVRProg::eraseChip </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send the erase command, then busy wait until the chip is erased. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if erase command succeeds </dd></dl>
+
+</div>
+</div>
+<a id="ae6bd8595158b4439f5901eb648e0d8d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6bd8595158b4439f5901eb648e0d8d2">&#9670;&nbsp;</a></span>readFuses()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AVRProg::readFuses </td>
+          <td>(</td>
+          <td class="paramtype">byte *&#160;</td>
+          <td class="paramname"><em>fuses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>numbytes</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Program the fuses on a device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fuses</td><td>Pointer to 4-byte array of fuses </td></tr>
+    <tr><td class="paramname">numbytes</td><td>How many fuses to read (<a class="el" href="struct_u_p_d_i.html">UPDI</a> has 10?) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if we were able to send data and get a response from the chip. You could still run <a class="el" href="class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728" title="Verify the fuses are set to what we expect. ">verifyFuses()</a> afterwards! </dd></dl>
 
 </div>
 </div>
@@ -236,8 +300,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="ace8068e573b2ae49b7b9ceac27391389"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace8068e573b2ae49b7b9ceac27391389">&#9670;&nbsp;</a></span>writeImage()</h2>
+<a id="ad99bdde99a9d06689c0e7c95d8d56eb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad99bdde99a9d06689c0e7c95d8d56eb2">&#9670;&nbsp;</a></span>writeImage()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -251,7 +315,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>pagesize</em>, </td>
         </tr>
         <tr>
@@ -281,14 +345,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="a9014e47745719cbcf570685c2acce7a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9014e47745719cbcf570685c2acce7a0">&#9670;&nbsp;</a></span>verifyImage()</h2>
+<a id="aab5693e13b97c7d8cd3c07a80b6b0fed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab5693e13b97c7d8cd3c07a80b6b0fed">&#9670;&nbsp;</a></span>verifyImage()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boolean Adafruit_AVRProg::verifyImage </td>
+          <td class="memname">bool Adafruit_AVRProg::verifyImage </td>
           <td>(</td>
           <td class="paramtype">const byte *&#160;</td>
           <td class="paramname"><em>hextext</em></td><td>)</td>
@@ -396,6 +460,50 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a id="a6cb136948a665297e165ea8f808e31f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cb136948a665297e165ea8f808e31f0">&#9670;&nbsp;</a></span>setUPDI()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Adafruit_AVRProg::setUPDI </td>
+          <td>(</td>
+          <td class="paramtype">HardwareSerial *&#160;</td>
+          <td class="paramname"><em>theSerial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>baudrate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>power_pin</em> = <code>-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set up programming to use <a class="el" href="struct_u_p_d_i.html">UPDI</a> interface. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">theSerial</td><td>Hardware serial interface (CANNOT use software serial!) </td></tr>
+    <tr><td class="paramname">baudrate</td><td>Try 115200 or less to start </td></tr>
+    <tr><td class="paramname">power_pin</td><td>pin connected to chip power (can help with <a class="el" href="struct_u_p_d_i.html">UPDI</a> since theres no reset line) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="abfdb5a9af9854ccadd458cfba2416e63"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abfdb5a9af9854ccadd458cfba2416e63">&#9670;&nbsp;</a></span>setProgramLED()</h2>
 
@@ -484,8 +592,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="adc33b5868126cfa0eac741fa5f409605"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc33b5868126cfa0eac741fa5f409605">&#9670;&nbsp;</a></span>writeByteToFlash()</h2>
+<a id="a68d97dc5cd6dbac0b0ad80ac2b09486a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68d97dc5cd6dbac0b0ad80ac2b09486a">&#9670;&nbsp;</a></span>writeByteToFlash()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -499,7 +607,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype">uint16_t&#160;</td>
           <td class="paramname"><em>pagesize</em>, </td>
         </tr>
         <tr>
@@ -632,6 +740,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_adafruit___a_v_r_prog_8h_source.html">Adafruit_AVRProg.h</a></li>
 <li>Adafruit_AVRProg.cpp</li>
+<li>Adafruit_UPDIProg.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
