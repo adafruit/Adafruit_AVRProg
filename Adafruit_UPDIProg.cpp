@@ -133,7 +133,7 @@ bool Adafruit_AVRProg::updi_serial_send_receive(uint8_t *data, uint16_t size, ui
 	uint32_t count = 0;
 	int b;
 
-    uint32_t t = millis();
+    //uint32_t t = millis();
 
 	if (updi_serial_send(data, size)) {
 		for (uint32_t i = 0; i < len; i++) {

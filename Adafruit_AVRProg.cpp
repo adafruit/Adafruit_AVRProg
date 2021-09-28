@@ -399,7 +399,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
                                   uint32_t chipsize) {
   uint32_t flash_start = 0;
 #ifdef SUPPORT_UPDI
-  flash_start = g_updi.config->flash_start
+  flash_start = g_updi.config->flash_start;
 #endif
 
   uint32_t pageaddr = 0;
