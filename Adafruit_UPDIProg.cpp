@@ -48,11 +48,11 @@ DeviceConfiguration g_device_configs[] = {
 uint8_t _updi_flash_page_buffer[AVR_PAGESIZE_MAX];
 
 
-void Adafruit_AVRProg::updi_serial_init(void) {
+void Adafruit_AVRProg::updi_serial_init() {
   _updi_serial_retry_counter = 0;
   _updi_serial_retry_count = 0;
 
-  uart->begin(115200, SERIAL_8E2);
+  uart->begin(_baudrate, SERIAL_8E2);
   uart->setTimeout(50);
   DEBUG_PHYSICAL("updi serial init set\n");
 
@@ -558,6 +558,8 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
 
 		//Write flash from hex file
 		if (tasks & UPDI_TASK_WRITE_FLASH) {
+                  Serial.printf("delta: %d millis\n", millis()-start);
+
           DEBUG("Writing %d bytes starting at %04X\n", size, address);
           if (data == NULL) {
             Serial.println(F("Data pointer null"));
@@ -986,10 +988,14 @@ bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t bufsize, uint8_
 
 bool Adafruit_AVRProg::updi_write_page(uint16_t address, uint16_t pagesize, uint8_t *pagedata) {
   //Serial.println("Writing a page");
+  uint32_t t = millis();
+
   if (!updi_is_prog_mode()) {
     DEBUG_VERBOSE("in updi_write_flash error: not in prog mode\n");
     return false;
   }
+Serial.printf("updi_is_prog_mode: %d millis\n", millis()-t);
+
   //Serial.println(F("Is in prog mode"));
   if (pagesize > AVR_PAGESIZE_MAX) {
     Serial.printf("Chip pagesize %d bytes exceeds %s byte maximum\n", pagesize, AVR_PAGESIZE_MAX);
@@ -998,10 +1004,13 @@ bool Adafruit_AVRProg::updi_write_page(uint16_t address, uint16_t pagesize, uint
   address = address - (address % pagesize); // round down to a page address
   Serial.printf("Writing %d bytes to 0x%x\n", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
 
+  t = millis();
   if (!updi_write_nvm(address, pagedata, pagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
     Serial.printf(" Failed\n");
     return false;
-  }
+  }                  
+  Serial.printf("updi_write_nvm: %d millis\n", millis()-t);
+
 
   //Serial.printf("Finished\n");
   return true;

@@ -31,7 +31,7 @@ typedef struct image {
                        ///< datasheet!
   byte image_pagesize; ///< Page size for flash programming, in bytes. check
                        ///< datasheet!
-#if defined(__SAMD21G18A__) || defined(TEENSYDUINO)
+#if defined(__SAMD21G18A__) || defined(__SAMD21E18A__) || defined(TEENSYDUINO)
   byte image_hexcode[50000]; ///< Max buffer for intel hex format image (text)
 #else
   byte image_hexcode[10000]; ///< Max buffer for intel hex format image (text)
@@ -64,7 +64,7 @@ public:
   void setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
               int8_t miso_pin);
 
-  void setUPDI(HardwareSerial *theUART, int8_t power_pin = -1);
+  void setUPDI(HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin = -1);
   void updi_serial_init(void);
   int updi_serial_read_wait(void);
   bool updi_serial_send(uint8_t *data, uint16_t size);
@@ -162,6 +162,7 @@ private:
 
   HardwareSerial *uart = NULL;
   int8_t _power = -1;
+  uint32_t _baudrate;
   uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
   uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
   bool _updi_serial_inited = false;

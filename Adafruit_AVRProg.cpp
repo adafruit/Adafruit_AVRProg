@@ -47,8 +47,9 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
   _sck = sck_pin;
 }
 
-void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, int8_t power_pin) {
+void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate, int8_t power_pin) {
   uart = theSerial;
+  _baudrate = baudrate;
   _power = power_pin;
 }
 
@@ -481,7 +482,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
 
       cksum += b;
-#if VERBOSE
+#if VERBOSE > 2
       Serial.print(b, HEX);
       Serial.write(' ');
 #endif
@@ -532,45 +533,45 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
 bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
   if (uart) {
     uint32_t pageaddr = 0;
-    uint16_t pagesize = g_updi.config->flash_pagesize;
-    uint16_t buffersize = AVR_PAGESIZE_MAX;
+    //uint16_t pagesize = g_updi.config->flash_pagesize;
+    uint16_t pagebuffersize = AVR_PAGESIZE_MAX;
     uint16_t chipsize = g_updi.config->flash_size;
-    uint8_t buffer2[buffersize];
+    uint8_t buffer1[pagebuffersize], buffer2[pagebuffersize];
 
 #if VERBOSE
     Serial.print("Chip size: ");
     Serial.println(chipsize, DEC);
     Serial.print("Buffer size: ");
-    Serial.println(buffersize, DEC);
+    Serial.println(pagebuffersize, DEC);
 #endif
 
     while ((pageaddr < chipsize) && hextext) {
       const byte *hextextpos =
-        readImagePage(hextext, pageaddr, buffersize, pageBuffer);
+        readImagePage(hextext, pageaddr, pagebuffersize, buffer1);
       
-      if (! updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, buffersize)) {
+      if (! updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, pagebuffersize)) {
         return false;
       }
       
-      for (uint16_t i = 0; i < buffersize; i++) {
-        if (pageBuffer[i] != buffer2[i]) {
+      for (int x = 0; x < pagebuffersize; x++) {
+        if (buffer1[x] != buffer2[x]) {
           Serial.print(F("Verification error at address 0x"));
-          Serial.print(pageaddr + i, HEX);
+          Serial.print(pageaddr + x, HEX);
           Serial.print(F(": Should be 0x"));
-          Serial.print(pageBuffer[i], HEX);
+          Serial.print(buffer1[x], HEX);
           Serial.print(F(" not 0x"));
-          Serial.println(buffer2[i], HEX);
+          Serial.println(buffer2[x], HEX);
           Serial.println("----");
-          for (uint16_t i = 0; i < buffersize; i++) {
-            Serial.printf("0x%02X, ", pageBuffer[i]);
-            if ((i % 16) == 15) {
+          for (uint16_t j = 0; j < pagebuffersize; j++) {
+            Serial.printf("0x%02X, ", buffer1[j]);
+            if ((j % 16) == 15) {
               Serial.println();
             }
           }
           Serial.println("vs.");
-          for (uint16_t i = 0; i < buffersize; i++) {
-            Serial.printf("0x%02X, ", buffer2[i]);
-            if ((i % 16) == 15) {
+          for (uint16_t j = 0; j < pagebuffersize; j++) {
+            Serial.printf("0x%02X, ", buffer2[j]);
+            if ((j % 16) == 15) {
               Serial.println();
             }
           }
@@ -579,7 +580,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         }
       }
       hextext = hextextpos;
-      pageaddr += buffersize;
+      pageaddr += pagebuffersize;
     }
   } else {
     startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
@@ -710,7 +711,9 @@ bool Adafruit_AVRProg::flashPage(byte *pagebuff, uint16_t pageaddr,
 #endif
 
   if (uart) {
-    return updi_run_tasks(UPDI_TASK_WRITE_FLASH, pagebuff, pageaddr, pagesize);
+    uint32_t t = millis();
+    bool x = updi_run_tasks(UPDI_TASK_WRITE_FLASH, pagebuff, pageaddr, pagesize);
+    Serial.printf("Took %d millis\n", millis()-t);
   } else {
     startProgramMode(FLASH_CLOCKSPEED);
     
