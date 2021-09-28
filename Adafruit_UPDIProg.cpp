@@ -573,8 +573,7 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
           }
 
           while (remainingsize > 0) {
-            if (!updi_write_page(address, flashpagesize, data)) {
-           // if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
+            if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
               //Serial.println("Writing flash failed");
               success = false;
               break;
