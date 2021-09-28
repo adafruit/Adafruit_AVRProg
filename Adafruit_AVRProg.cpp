@@ -2,10 +2,10 @@
 #include "Adafruit_AVRProg.h"
 #include "Adafruit_UPDIProg.h"
 
-#if defined(__AVR__) // smol mem
+#if defined(__AVR__)         // smol mem
 static byte pageBuffer[128]; /* One page of flash */
 #else
-static byte pageBuffer[8*1024]; // we can megabuff
+static byte pageBuffer[8 * 1024]; // we can megabuff
 #endif
 
 /**************************************************************************/
@@ -51,12 +51,21 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
   _sck = sck_pin;
 }
 
-void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate, int8_t power_pin) {
+/**************************************************************************/
+/*!
+    @brief  Set up programming to use UPDI interface
+    @param  theSerial Hardware serial interface (CANNOT use software serial!)
+    @param  baudrate Try 115200 or less to start
+    @param  power_pin pin connected to chip power (can help with UPDI since
+    theres no reset line)
+*/
+/**************************************************************************/
+void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate,
+                               int8_t power_pin) {
   uart = theSerial;
   _baudrate = baudrate;
   _power = power_pin;
 }
-
 
 /**************************************************************************/
 /*!
@@ -116,15 +125,15 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
     return false; // not supported on this platform :(
 #else
     updi_init(true);
-    if (! updi_check()) {
+    if (!updi_check()) {
       DEBUG_VERBOSE("UPDI not initialised\n");
-      
+
       if (!updi_device_force_reset()) {
         DEBUG_VERBOSE("double BREAK reset failed\n");
         return false;
       }
-      updi_init(false);	// re-init the UPDI interface
-      
+      updi_init(false); // re-init the UPDI interface
+
       if (!updi_check()) {
         DEBUG_VERBOSE("Cannot initialise UPDI, aborting.\n");
         // TODO find out why these are not already correct
@@ -139,43 +148,43 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
     return true;
 #endif
   } else {
-      if (_reset >= 0) {
-        pinMode(_reset, OUTPUT);
-        digitalWrite(_reset, HIGH);
-        delay(5);
-      }
+    if (_reset >= 0) {
+      pinMode(_reset, OUTPUT);
+      digitalWrite(_reset, HIGH);
+      delay(5);
+    }
 
-      if (spi) {
-        debug(F("Using hardware SPI"));
-        spi->begin();
-        spi->beginTransaction(SPISettings(clockspeed, MSBFIRST, SPI_MODE0));
-      } else if (_sck > 0 && _mosi > 0 && _miso > 0) {
-        debug(F("Using software SPI"));
-        pinMode(_sck, OUTPUT);
-        digitalWrite(_sck, LOW);
-        pinMode(_miso, INPUT);
-        pinMode(_mosi, OUTPUT);
-        float _delay = 1000.0 * 1000.0 / (float)clockspeed;
-        // Serial.println(_delay);
-        spiBitDelay = _delay;
-      } else {
-        error(F("Neither hardware or software SPI modes selected"));
-      }
-      debug("...spi_init done");
+    if (spi) {
+      debug(F("Using hardware SPI"));
+      spi->begin();
+      spi->beginTransaction(SPISettings(clockspeed, MSBFIRST, SPI_MODE0));
+    } else if (_sck > 0 && _mosi > 0 && _miso > 0) {
+      debug(F("Using software SPI"));
+      pinMode(_sck, OUTPUT);
+      digitalWrite(_sck, LOW);
+      pinMode(_miso, INPUT);
+      pinMode(_mosi, OUTPUT);
+      float _delay = 1000.0 * 1000.0 / (float)clockspeed;
+      // Serial.println(_delay);
+      spiBitDelay = _delay;
+    } else {
+      error(F("Neither hardware or software SPI modes selected"));
+    }
+    debug("...spi_init done");
 
-      if (_reset >= 0) {
-        digitalWrite(_reset, LOW);
-      }
+    if (_reset >= 0) {
+      digitalWrite(_reset, LOW);
+    }
 
-      debug("...isp_transaction");
-      uint16_t reply = isp_transaction(0xAC, 0x53, 0x00, 0x00);
-      if (reply == 0x5300) {
-        debug("...Done");
-        programmode = true;
-        return true;
-      }
-      Serial.print(reply, HEX);
-      return false;
+    debug("...isp_transaction");
+    uint16_t reply = isp_transaction(0xAC, 0x53, 0x00, 0x00);
+    if (reply == 0x5300) {
+      debug("...Done");
+      programmode = true;
+      return true;
+    }
+    Serial.print(reply, HEX);
+    return false;
   }
 }
 
@@ -207,15 +216,15 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
   } else {
     // SPI mode
     startProgramMode(FUSE_CLOCKSPEED);
-    
+
     uint16_t target_type = 0;
-    
+
     target_type = isp_transaction(0x30, 0x00, 0x01, 0x00);
     target_type <<= 8;
     target_type |= isp_transaction(0x30, 0x00, 0x02, 0x00);
-    
+
     endProgramMode();
-    
+
     return target_type;
   }
 }
@@ -223,6 +232,7 @@ uint16_t Adafruit_AVRProg::readSignature(void) {
 /**************************************************************************/
 /*!
     @brief    Send the erase command, then busy wait until the chip is erased
+    @returns  True if erase command succeeds
 */
 /**************************************************************************/
 bool Adafruit_AVRProg::eraseChip(void) {
@@ -243,11 +253,11 @@ bool Adafruit_AVRProg::eraseChip(void) {
   }
 }
 
-
 /**************************************************************************/
 /*!
     @brief    Program the fuses on a device
     @param    fuses Pointer to 4-byte array of fuses
+    @param    numbytes How many fuses to read (UPDI has 10?)
     @return True if we were able to send data and get a response from the chip.
     You could still run verifyFuses() afterwards!
 */
@@ -255,15 +265,15 @@ bool Adafruit_AVRProg::eraseChip(void) {
 bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
   (void)fuses[0];
   (void)numbytes;
-  
+
   if (uart) {
 #ifndef SUPPORT_UPDI
     return false; // not supported on this platform :(
 #else
-    if (! updi_run_tasks(UPDI_TASK_READ_FUSES, NULL)) {
+    if (!updi_run_tasks(UPDI_TASK_READ_FUSES, NULL)) {
       return false;
     }
-    for (uint8_t i=0; i<numbytes; i++) {
+    for (uint8_t i = 0; i < numbytes; i++) {
       fuses[i] = g_updi.fuses[i];
     }
     return true;
@@ -273,7 +283,6 @@ bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
     return false;
   }
 }
-
 
 /**************************************************************************/
 /*!
@@ -405,7 +414,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
   uint32_t pageaddr = 0;
 
 #if VERBOSE
-  Serial.print(F("Chip size: ")); 
+  Serial.print(F("Chip size: "));
   Serial.println(chipsize, DEC);
   Serial.print(F("Page size: "));
   Serial.println(pagesize, DEC);
@@ -421,7 +430,7 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
         blankpage = false;
     }
     if (!blankpage) {
-      if (!flashPage(pageBuffer, flash_start+pageaddr, pagesize))
+      if (!flashPage(pageBuffer, flash_start + pageaddr, pagesize))
         return false;
     }
     hextext = hextextpos;
@@ -438,8 +447,8 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
  */
 
 const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
-                                            uint16_t pageaddr, uint16_t pagesize,
-                                            byte *page) {
+                                            uint16_t pageaddr,
+                                            uint16_t pagesize, byte *page) {
   uint16_t len;
   uint16_t page_idx = 0;
   const byte *beginning = hextext;
@@ -467,7 +476,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     len = hexToByte(pgm_read_byte(hextext++));
     len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
     cksum = len;
-    //Serial.print(len);
+    // Serial.print(len);
 
     // read high address byte
     b = hexToByte(pgm_read_byte(hextext++));
@@ -488,7 +497,7 @@ const byte *Adafruit_AVRProg::readImagePage(const byte *hextext,
     b = hexToByte(pgm_read_byte(hextext++)); // record type
     b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
     cksum += b;
-    //Serial.print("Record type "); Serial.println(b, HEX);
+    // Serial.print("Record type "); Serial.println(b, HEX);
     if (b == 0x1) {
       // end record, return nullptr to indicate we're done
       hextext = nullptr;
@@ -561,7 +570,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
     return false; // not supported on this platform :(
 #else
     uint32_t pageaddr = 0;
-    //uint16_t pagesize = g_updi.config->flash_pagesize;
+    // uint16_t pagesize = g_updi.config->flash_pagesize;
     uint16_t pagebuffersize = AVR_PAGESIZE_MAX;
     uint16_t chipsize = g_updi.config->flash_size;
     uint8_t buffer1[pagebuffersize], buffer2[pagebuffersize];
@@ -575,12 +584,14 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
 
     while ((pageaddr < chipsize) && hextext) {
       const byte *hextextpos =
-        readImagePage(hextext, pageaddr, pagebuffersize, buffer1);
-      
-      if (! updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2, g_updi.config->flash_start + pageaddr, pagebuffersize)) {
+          readImagePage(hextext, pageaddr, pagebuffersize, buffer1);
+
+      if (!updi_run_tasks(UPDI_TASK_READ_FLASH, buffer2,
+                          g_updi.config->flash_start + pageaddr,
+                          pagebuffersize)) {
         return false;
       }
-      
+
       for (uint16_t x = 0; x < pagebuffersize; x++) {
         if (buffer1[x] != buffer2[x]) {
           Serial.print(F("Verification error at address 0x"));
@@ -615,13 +626,13 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
 #endif
   } else {
     startProgramMode(FLASH_CLOCKSPEED); // start at 1MHz speed
-    
+
     uint16_t len;
     byte b, cksum = 0;
-    
+
     while (1) {
       uint16_t lineaddr;
-      
+
       // read one line!
       char c = pgm_read_byte(hextext++);
       if (c == '\n' || c == '\r') {
@@ -635,7 +646,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
       len = hexToByte(pgm_read_byte(hextext++));
       len = (len << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum = len;
-      
+
       b = hexToByte(pgm_read_byte(hextext++)); // record type
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum += b;
@@ -644,23 +655,23 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum += b;
       lineaddr = (lineaddr << 8) + b;
-      
+
       b = hexToByte(pgm_read_byte(hextext++)); // record type
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum += b;
-      
+
       // Serial.print("Record type "); Serial.println(b, HEX);
       if (b == 0x1) {
         // end record!
         break;
       }
-      
+
       for (byte i = 0; i < len; i++) {
         // read 'n' bytes
         b = hexToByte(pgm_read_byte(hextext++));
         b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
         cksum += b;
-        
+
 #if VERBOSE
         Serial.print("$");
         Serial.print(lineaddr, HEX);
@@ -668,7 +679,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         Serial.print(b, HEX);
         Serial.write(" ? ");
 #endif
-        
+
         // verify this byte!
         byte reply;
         if (lineaddr % 2) { // for 'high' bytes
@@ -687,7 +698,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         }
         lineaddr++;
       }
-      
+
       b = hexToByte(pgm_read_byte(hextext++)); // chxsum
       b = (b << 4) + hexToByte(pgm_read_byte(hextext++));
       cksum += b;
@@ -699,7 +710,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         error(F("No end of line"));
       }
     }
-    
+
     endProgramMode();
   }
   return true;
@@ -732,7 +743,7 @@ bool Adafruit_AVRProg::flashPage(byte *pagebuff, uint16_t pageaddr,
 
 #if VERBOSE
   for (uint16_t i = 0; i < pagesize; i++) {
-    if (pagebuff[i] <= 0xF) 
+    if (pagebuff[i] <= 0xF)
       Serial.print('0');
     Serial.print(pagebuff[i], HEX);
     Serial.print(" ");
@@ -745,37 +756,38 @@ bool Adafruit_AVRProg::flashPage(byte *pagebuff, uint16_t pageaddr,
 #ifndef SUPPORT_UPDI
     return false;
 #else
-    //uint32_t t = millis();
-    bool x = updi_run_tasks(UPDI_TASK_WRITE_FLASH, pagebuff, pageaddr, pagesize);
-    //Serial.printf("Took %d millis\n", millis()-t);
+    // uint32_t t = millis();
+    bool x =
+        updi_run_tasks(UPDI_TASK_WRITE_FLASH, pagebuff, pageaddr, pagesize);
+    // Serial.printf("Took %d millis\n", millis()-t);
     return x;
 #endif
   } else {
     startProgramMode(FLASH_CLOCKSPEED);
-    
+
     for (uint16_t i = 0; i < pagesize / 2; i++) {
       if (!flashWord(LOW, i, pagebuff[2 * i]))
         return false;
       if (!flashWord(HIGH, i, pagebuff[2 * i + 1]))
         return false;
     }
-    
+
     // page addr is in bytes, but we need to convert to words (/2)
     // Serial.print("page addr "); Serial.println(pageaddr);
     pageaddr /= 2;
-    
+
     uint16_t commitreply =
-      isp_transaction(0x4C, (pageaddr >> 8) & 0xFF, pageaddr & 0xFF, 0);
-    
+        isp_transaction(0x4C, (pageaddr >> 8) & 0xFF, pageaddr & 0xFF, 0);
+
     Serial.print(F("  Commit Page: 0x"));
     Serial.print(pageaddr, HEX);
     Serial.print(F(" -> 0x"));
     Serial.println(commitreply, HEX);
     if (commitreply != pageaddr)
       return false;
-    
+
     busyWait();
-    
+
     endProgramMode();
   }
   return true;

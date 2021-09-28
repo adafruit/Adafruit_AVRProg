@@ -64,12 +64,15 @@ public:
   void setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
               int8_t miso_pin);
 
-  void setUPDI(HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin = -1);
+  void setUPDI(HardwareSerial *theUART, uint32_t baudrate,
+               int8_t power_pin = -1);
 #ifdef SUPPORT_UPDI
+private:
   void updi_serial_init(void);
   int updi_serial_read_wait(void);
   bool updi_serial_send(uint8_t *data, uint16_t size);
-  bool updi_serial_send_receive(uint8_t *data, uint16_t size, uint8_t *buff, uint32_t len);
+  bool updi_serial_send_receive(uint8_t *data, uint16_t size, uint8_t *buff,
+                                uint32_t len);
 
   void updi_send_handshake(void);
   void updi_serial_term();
@@ -82,7 +85,8 @@ public:
   bool updi_ld_ptr_inc(uint8_t *buffer, uint16_t size);
 
   bool updi_write_data(uint32_t address, uint8_t *data, uint32_t len);
-  bool updi_write_data_words(uint32_t address, uint8_t *data, uint32_t numwords);
+  bool updi_write_data_words(uint32_t address, uint8_t *data,
+                             uint32_t numwords);
   bool updi_read_data(uint32_t address, uint8_t *buf, uint32_t size);
 
   void updi_st_ptr_inc16(uint8_t *data, uint32_t numwords);
@@ -95,10 +99,13 @@ public:
   void updi_serial_force_break(void);
   bool updiIsConnected(bool silent);
   bool updi_init(bool force);
-  bool updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
+  bool updi_run_tasks(uint16_t tasks, uint8_t *data = NULL,
+                      uint32_t address = 0, uint32_t size = 0);
 
   bool updi_wait_flash_ready();
-  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash=true, bool verify=true);
+  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len,
+                      uint8_t command, bool use_word_acess,
+                      bool block_on_flash = true, bool verify = true);
   bool updi_execute_nvm_command(uint8_t command);
 
   void updi_apply_reset();
@@ -123,6 +130,7 @@ public:
   DeviceIdentification *updi_chip_lookup(uint16_t sig, char *name);
 #endif
 
+public:
   /*!
     @brief  Set up a GPIO as a programming-indicator LED
     @param led The pin to use for the LED */
