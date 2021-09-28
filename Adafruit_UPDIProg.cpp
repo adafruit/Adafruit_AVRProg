@@ -61,18 +61,17 @@ void Adafruit_AVRProg::updi_serial_init() {
 
 
 int Adafruit_AVRProg::updi_serial_read_wait(void) {
+  uint32_t timeout = millis() + 250;
   int b = -1;
   _updi_serial_retry_counter++;
   _updi_serial_retry_count++;
   
   // try to wait for data
-  while (_updi_serial_retry_counter++) {
+  while (millis() < timeout) {
     if (uart->available()) {
       b = uart->read();
       break;
     }
-    delay(1);
-    _updi_serial_retry_count++;
   }
   _updi_serial_retry_counter = 0;
   return b;
@@ -100,7 +99,9 @@ bool Adafruit_AVRProg::updi_serial_send(uint8_t *data, uint16_t size) {
     DEBUG_PHYSICAL("UPDISERIAL send count error %d != %d\n", count, size);
     return false;
 	}
-  delay(2);
+
+  yield();
+
   count = 0;
   for (uint16_t i = 0; i < size; i++) {
     b = updi_serial_read_wait(); // wait for data
@@ -129,6 +130,8 @@ bool Adafruit_AVRProg::updi_serial_send_receive(uint8_t *data, uint16_t size, ui
 	bool timeout = false;
 	uint32_t count = 0;
 	int b;
+
+    uint32_t t = millis();
 
 	if (updi_serial_send(data, size)) {
 		for (uint32_t i = 0; i < len; i++) {
@@ -558,7 +561,9 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
 
 		//Write flash from hex file
 		if (tasks & UPDI_TASK_WRITE_FLASH) {
-                  Serial.printf("delta: %d millis\n", millis()-start);
+          Serial.printf("delta: %d millis\n", millis()-start);          
+          int16_t flashpagesize = g_updi.config->flash_pagesize;
+          int32_t remainingsize = size;
 
           DEBUG("Writing %d bytes starting at %04X\n", size, address);
           if (data == NULL) {
@@ -566,14 +571,19 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
             success = false;
             break;
           }
-          
-          if (!updi_write_page(address, size, data)) {
-            //Serial.println("Writing flash failed");
-            success = false;
-            break;
-          } else {
-            //Serial.println("Flash written\n");
-          }          
+
+          while (remainingsize > 0) {
+            if (!updi_write_page(address, flashpagesize, data)) {
+              //Serial.println("Writing flash failed");
+              success = false;
+              break;
+            } else {
+              //Serial.println("Flash written\n");
+            }
+            remainingsize -= flashpagesize;
+            address += flashpagesize;
+            data += flashpagesize;
+          }
         }
 
 
@@ -994,7 +1004,6 @@ bool Adafruit_AVRProg::updi_write_page(uint16_t address, uint16_t pagesize, uint
     DEBUG_VERBOSE("in updi_write_flash error: not in prog mode\n");
     return false;
   }
-Serial.printf("updi_is_prog_mode: %d millis\n", millis()-t);
 
   //Serial.println(F("Is in prog mode"));
   if (pagesize > AVR_PAGESIZE_MAX) {
@@ -1004,6 +1013,7 @@ Serial.printf("updi_is_prog_mode: %d millis\n", millis()-t);
   address = address - (address % pagesize); // round down to a page address
   Serial.printf("Writing %d bytes to 0x%x\n", pagesize, address); // deliberately no LF; the start + progress + finish messages are all combined
 
+  Serial.printf("before write: %d millis\n", millis()-t);
   t = millis();
   if (!updi_write_nvm(address, pagedata, pagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
     Serial.printf(" Failed\n");
@@ -1207,11 +1217,14 @@ bool Adafruit_AVRProg::updi_wait_flash_ready() {
 
 //Writes a page of data to NVM. By default the PAGE_WRITE command is used, which requires that the page is already erased. By default word access is used (flash)
 bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess) {
+  uint32_t t = millis();
+
 	//wait for NVM controller to be ready
 	if (!updi_wait_flash_ready()) {
 		DEBUG_VERBOSE("in updi_write_nvm() error: cant wait flash ready\n");
 		return false;
 	}
+    Serial.printf("wait flash 1: %d ms\n", millis()-t); t = millis();
 
 	//Clear page buffer
 	if (!updi_execute_nvm_command(UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR)) {
@@ -1219,11 +1232,15 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		return false;
 	}
 
+    Serial.printf("clear page: %d ms\n", millis()-t); t = millis();
+
 	//wait for NVM controller to be ready
 	if (!updi_wait_flash_ready()) {
 		DEBUG_VERBOSE("in updi_write_nvm() error: cant wait flash ready after page buffer clear\n");
 		return false;
 	}
+
+    Serial.printf("wait flash 2: %d ms\n", millis()-t); t = millis();
 
 	//Load the page buffer by writing directly to location
 	// FYI: word access is significantly faster for write but no faster for read
@@ -1239,17 +1256,24 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 		}
 	}
 
+    Serial.printf("write page: %d ms\n", millis()-t); t = millis();
+
 	//Write the page to NVM, maybe erase first
 	if (!updi_execute_nvm_command(command)) {
 		DEBUG_VERBOSE("in updi_write_nvm() error: execute_nvm_command() error committing page\n");
 		return false;
 	}
 
+    Serial.printf("nvm write: %d ms\n", millis()-t); t = millis();
+
 	//wait for NVM controller to be ready
 	if (!updi_wait_flash_ready()) {
 		DEBUG_VERBOSE("in updi_write_nvm() error: cant wait flash ready after commit page\n");
 		return false;
 	}
+
+    Serial.printf("wait flash 3: %d ms\n", millis()-t); t = millis();
+
 
 	return true;
 }
