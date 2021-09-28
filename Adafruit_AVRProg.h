@@ -97,7 +97,7 @@ public:
   bool updi_run_tasks(uint16_t tasks, uint8_t* data = NULL, uint32_t address = 0, uint32_t size = 0);
 
   bool updi_wait_flash_ready();
-  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess);
+  bool updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash=true);
   bool updi_execute_nvm_command(uint8_t command);
 
   void updi_apply_reset();

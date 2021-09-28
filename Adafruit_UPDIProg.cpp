@@ -573,7 +573,7 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t* data, uint32_t ad
           }
 
           while (remainingsize > 0) {
-            if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
+            if (!updi_write_nvm(address, data, flashpagesize, UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true, false)) {
               //Serial.println("Writing flash failed");
               success = false;
               break;
@@ -1216,7 +1216,7 @@ bool Adafruit_AVRProg::updi_wait_flash_ready() {
 
 
 //Writes a page of data to NVM. By default the PAGE_WRITE command is used, which requires that the page is already erased. By default word access is used (flash)
-bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess) {
+bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t len, uint8_t command, bool use_word_acess, bool block_on_flash) {
   uint32_t t = millis();
 
 	//wait for NVM controller to be ready
@@ -1266,14 +1266,14 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data, uint32_t 
 
     Serial.printf("nvm write: %d ms\n", millis()-t); t = millis();
 
-	//wait for NVM controller to be ready
-	if (!updi_wait_flash_ready()) {
+    if (block_on_flash) {
+      //wait for NVM controller to be ready
+      if (!updi_wait_flash_ready()) {
 		DEBUG_VERBOSE("in updi_write_nvm() error: cant wait flash ready after commit page\n");
 		return false;
-	}
+      }
 
-    Serial.printf("wait flash 3: %d ms\n", millis()-t); t = millis();
-
-
+      Serial.printf("wait flash 3: %d ms\n", millis()-t); t = millis();
+    }
 	return true;
 }
