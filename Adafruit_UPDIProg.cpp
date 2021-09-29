@@ -77,7 +77,7 @@ void Adafruit_AVRProg::updi_serial_init() {
   _updi_serial_retry_count = 0;
 
   // start slow
-  uart->begin(min(_baudrate, 57600), SERIAL_8E2);
+  uart->begin(min((uint32_t)_baudrate, (uint32_t)57600), SERIAL_8E2);
   uart->setTimeout(10);
   DEBUG_PHYSICAL("updi serial init set\n");
 
@@ -1288,7 +1288,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data,
                                       uint32_t len, uint8_t command,
                                       bool use_word_acess, bool block_on_flash,
                                       bool verify) {
-  uint32_t t = millis();
+  // uint32_t t = millis();
 
   // wait for NVM controller to be ready
   if (!updi_wait_flash_ready()) {
