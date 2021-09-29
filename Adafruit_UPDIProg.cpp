@@ -76,7 +76,8 @@ void Adafruit_AVRProg::updi_serial_init() {
   _updi_serial_retry_counter = 0;
   _updi_serial_retry_count = 0;
 
-  uart->begin(_baudrate, SERIAL_8E2);
+  // start slow
+  uart->begin(min(_baudrate, 57600), SERIAL_8E2);
   uart->setTimeout(10);
   DEBUG_PHYSICAL("updi serial init set\n");
 
@@ -461,6 +462,11 @@ bool Adafruit_AVRProg::updi_init(bool force) {
 
   udpi_stcs(UPDI_CS_CTRLB, 1 << UPDI_CTRLB_CCDETDIS_BIT);
   udpi_stcs(UPDI_CS_CTRLA, 1 << UPDI_CTRLA_IBDLY_BIT);
+  if (_baudrate > 230000) {
+    udpi_stcs(UPDI_ASI_CTRLA, 0x1); // set 16mhz for higher baudrate!
+  }
+  uart->begin(_baudrate, SERIAL_8E2);
+
   return updi_check();
 }
 
