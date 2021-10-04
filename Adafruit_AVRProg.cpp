@@ -61,10 +61,11 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
 */
 /**************************************************************************/
 void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate,
-                               int8_t power_pin) {
+                               int8_t power_pin, bool invertpower) {
   uart = theSerial;
   _baudrate = baudrate;
   _power = power_pin;
+  _invertpower = invertpower;
 }
 
 /**************************************************************************/

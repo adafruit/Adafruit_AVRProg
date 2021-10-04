@@ -451,9 +451,9 @@ void Adafruit_AVRProg::updi_serial_force_break(void) {
 bool Adafruit_AVRProg::updi_init(bool force) {
   if (force && (_power >= 0)) {
     pinMode(_power, OUTPUT);
-    digitalWrite(_power, LOW);
+    digitalWrite(_power, _invertpower);
     delay(10);
-    digitalWrite(_power, HIGH);
+    digitalWrite(_power, !_invertpower);
     delay(10);
   }
   updi_serial_init();
@@ -833,6 +833,61 @@ void Adafruit_AVRProg::updi_leave_progmode() {
   return;
 }
 
+
+bool Adafruit_AVRProg::unlocky(void) {
+  bool success;
+
+  updi_init(true);
+
+  if (!updi_check()) {
+    DEBUG_TASK("UPDI not initialised\n");
+    
+    if (!updi_device_force_reset()) {
+      DEBUG_TASK("double BREAK reset failed\n");
+      success = false;
+      return false;
+    }
+    updi_init(false); // re-init the UPDI interface
+    
+    if (!updi_check()) {
+      DEBUG_PHYSICAL("Cannot initialise UPDI, aborting.\n");
+      // TODO find out why these are not already correct
+      g_updi.initialized = false;
+      g_updi.unlocked = false;
+      success = false;
+      return false;
+    } else {
+      DEBUG_PHYSICAL("UPDI INITIALISED\n");
+      g_updi.initialized = true;
+    }
+  } else {
+    DEBUG_PHYSICAL("UPDI ALREADY INITIALISED\n");
+    g_updi.initialized = true;
+  }
+
+
+  if (updi_ldcs(UPDI_ASI_SYS_STATUS) & (1<<UPDI_ASI_SYS_STATUS_LOCKSTATUS)) {
+    Serial.println("We are in fact locked");
+  }
+
+  // enter key
+  updi_write_key(UPDI_KEY_64, (uint8_t *)UPDI_KEY_CHIPERASE);
+
+  // updi_check key status
+  uint8_t key_status = updi_ldcs(UPDI_ASI_KEY_STATUS);
+  if (!(key_status & (1 << UPDI_ASI_KEY_STATUS_CHIPERASE))) {
+    DEBUG_VERBOSE("Unlock error: key not accepted\n");
+    return false;
+  }
+  Serial.println("Unlock key inserted");
+  
+  updi_apply_reset();
+
+  updi_wait_unlocked(500);
+
+  return true;
+}
+
 // Unlock and erase
 bool Adafruit_AVRProg::updi_unlock_device() {
   DEBUG_VERBOSE("UNLOCKING AND ERASING\n");
@@ -856,7 +911,7 @@ bool Adafruit_AVRProg::updi_unlock_device() {
   updi_apply_reset();
 
   // wait for unlock
-  if (!updi_wait_unlocked(100)) {
+  if (!updi_wait_unlocked(500)) {
     DEBUG_VERBOSE("Failed to chip erase using key\n");
     return false;
   }

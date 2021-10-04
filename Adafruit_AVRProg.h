@@ -69,8 +69,10 @@ public:
               int8_t miso_pin);
 
   void setUPDI(HardwareSerial *theUART, uint32_t baudrate,
-               int8_t power_pin = -1);
+               int8_t power_pin = -1, bool invertpower = false);
 #ifdef SUPPORT_UPDI
+  bool unlocky();
+
 private:
   void updi_serial_init(void);
   int updi_serial_read_wait(void);
@@ -118,7 +120,6 @@ private:
   bool updi_progmode_key();
   bool updi_enter_progmode();
   void updi_leave_progmode();
-
   bool updi_unlock_device();
   bool updi_get_device_info();
 
@@ -153,6 +154,10 @@ public:
   void error(const char *string);
   void error(const __FlashStringHelper *string);
 
+#ifdef SUPPORT_UPDI
+  UPDI g_updi;
+#endif
+
 private:
   bool startProgramMode(uint32_t clockrate = 100000);
   void endProgramMode(void);
@@ -176,12 +181,12 @@ private:
 
   HardwareSerial *uart = NULL;
   int8_t _power = -1;
+  bool _invertpower = false;
   uint32_t _baudrate;
 #ifdef SUPPORT_UPDI
   uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
   uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
   bool _updi_serial_inited = false;
-  UPDI g_updi;
 #endif
 };
 
