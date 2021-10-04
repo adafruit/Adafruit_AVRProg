@@ -23,9 +23,9 @@ typedef struct image {
   char image_name[30];     ///< i.e. "optiboot_diecimila.hex"
   char image_chipname[12]; ///< i.e. "atmega168"
   uint16_t image_chipsig;  ///< Low two bytes of signature, check datasheet!
-  byte image_progfuses[5]; ///< fuses to set during programming (e.g unlock)
-  byte image_normfuses[5]; ///< fuses to set after programming (e.g lock)
-  byte fusemask[4]; ///< Not all bits are used in the fuses, mask the ones we do
+  byte image_progfuses[10]; ///< fuses to set during programming (e.g unlock)
+  byte image_normfuses[10]; ///< fuses to set after programming (e.g lock)
+  byte fusemask[10]; ///< Not all bits are used in the fuses, mask the ones we do
                     ///< use
   uint16_t chipsize;   ///< Total size for flash programming, in bytes. check
                        ///< datasheet!
@@ -56,7 +56,9 @@ public:
   bool eraseChip(void);
 
   bool readFuses(byte *fuses, uint8_t numbytes);
-  bool programFuses(const byte *fuses);
+  bool programFuses(const byte *fuses, uint8_t num_fuses=5);
+  bool programFuse(byte fuse, uint8_t num);
+
   bool verifyFuses(const byte *fuses, const byte *fusemask);
 
   bool writeImage(const byte *hextext, uint32_t pagesize, uint32_t chipsize);

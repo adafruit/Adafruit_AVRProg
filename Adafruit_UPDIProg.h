@@ -47,12 +47,11 @@ SOFTWARE.
 //#define DEBUG_TASK(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
 #define DEBUG_TASK(fmt, ...)                                                   \
   {}
-//#define DEBUG_VERBOSE(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
-#define DEBUG_VERBOSE(fmt, ...)                                                \
+#define DEBUG_VERBOSE(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
+//#define DEBUG_VERBOSE(fmt, ...)                                                \
   {}
-//#define DEBUG_PHYSICAL(fmt, ...)		Serial.printf(fmt,
-//##__VA_ARGS__)
-#define DEBUG_PHYSICAL(fmt, ...)
+#define DEBUG_PHYSICAL(fmt, ...)		Serial.printf(fmt, ##__VA_ARGS__)
+//#define DEBUG_PHYSICAL(fmt, ...)
 
 #define UPDI_BREAK 0x00
 

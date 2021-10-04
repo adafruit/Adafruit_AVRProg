@@ -255,7 +255,7 @@ bool Adafruit_AVRProg::eraseChip(void) {
 
 /**************************************************************************/
 /*!
-    @brief    Program the fuses on a device
+    @brief    Read the fuses on a device
     @param    fuses Pointer to 4-byte array of fuses
     @param    numbytes How many fuses to read (UPDI has 10?)
     @return True if we were able to send data and get a response from the chip.
@@ -292,51 +292,123 @@ bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
     You could still run verifyFuses() afterwards!
 */
 /**************************************************************************/
-bool Adafruit_AVRProg::programFuses(const byte *fuses) {
+bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
   startProgramMode(FUSE_CLOCKSPEED);
 
-  byte f;
-  Serial.println(F("\nSetting fuses"));
+  if (uart) {
+#ifndef SUPPORT_UPDI
+    return false; // not supported on this platform :(
+#else
 
-  f = pgm_read_byte(&fuses[FUSE_PROT]);
-  if (f) {
-    Serial.print(F("\tSet Lock Fuse to: "));
-    Serial.println(f, HEX);
-    if ((isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF) != 0xE000) {
+    uint8_t old_fuses[10];
+    if (!updi_run_tasks(UPDI_TASK_READ_FUSES, NULL)) {
       return false;
     }
-  }
-  busyWait();
-  f = pgm_read_byte(&fuses[FUSE_LOW]);
-  if (f) {
-    Serial.print(F("\tSet Low Fuse to: "));
-    Serial.println(f, HEX);
-    if ((isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF) != 0xA000) {
+    Serial.print("Old fuses: ");
+    for (uint8_t i = 0; i < num_fuses; i++) {
+      old_fuses[i] = g_updi.fuses[i];
+      Serial.print("0x");
+      Serial.print(old_fuses[i], HEX);
+      Serial.print(", ");
+    }
+
+    for (uint8_t f=0; f<num_fuses; f++) {
+      if (f == (AVR_FUSE_LOCK - AVR_FUSE_BASE)) {
+	Serial.println("Nope: we are not going to let you change the lock bits\n");
+	continue;
+      }
+
+      g_updi.fuses[f] = fuses[f];
+    }
+
+    if (!updi_run_tasks(UPDI_TASK_WRITE_FUSES, NULL)) {
       return false;
     }
+
+    return true;
+#endif
+  } else {
+
+    byte f;
+    Serial.println(F("\nSetting fuses"));
+    
+    f = pgm_read_byte(&fuses[FUSE_PROT]);
+    if (f) {
+      Serial.print(F("\tSet Lock Fuse to: "));
+      Serial.println(f, HEX);
+      if ((isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF) != 0xE000) {
+	return false;
+      }
+    }
+    busyWait();
+    f = pgm_read_byte(&fuses[FUSE_LOW]);
+    if (f) {
+      Serial.print(F("\tSet Low Fuse to: "));
+      Serial.println(f, HEX);
+      if ((isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF) != 0xA000) {
+	return false;
+      }
+    }
+    busyWait();
+    f = pgm_read_byte(&fuses[FUSE_HIGH]);
+    if (f) {
+      Serial.print(F("\tSet High Fuse to: "));
+      Serial.println(f, HEX);
+      if ((isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF) != 0xA800) {
+	return false;
+      }
+    }
+    busyWait();
+    f = pgm_read_byte(&fuses[FUSE_EXT]);
+    if (f) {
+      Serial.print(F("\tSet Ext Fuse to: "));
+      Serial.println(f, HEX);
+      if ((isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF) != 0xA400) {
+	return false;
+      }
+    }
+    busyWait();
+    Serial.println();
+    endProgramMode();
+    return true;
   }
-  busyWait();
-  f = pgm_read_byte(&fuses[FUSE_HIGH]);
-  if (f) {
-    Serial.print(F("\tSet High Fuse to: "));
-    Serial.println(f, HEX);
-    if ((isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF) != 0xA800) {
+}
+
+bool Adafruit_AVRProg::programFuse(byte fuse, uint8_t num) {
+  if (uart) {
+#ifndef SUPPORT_UPDI
+    return false; // not supported on this platform :(
+#else
+
+    uint8_t old_fuses[10];
+    if (!updi_run_tasks(UPDI_TASK_READ_FUSES, NULL)) {
       return false;
     }
-  }
-  busyWait();
-  f = pgm_read_byte(&fuses[FUSE_EXT]);
-  if (f) {
-    Serial.print(F("\tSet Ext Fuse to: "));
-    Serial.println(f, HEX);
-    if ((isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF) != 0xA400) {
+    Serial.print("Old fuses: ");
+    for (uint8_t i = 0; i < 10; i++) {
+      old_fuses[i] = g_updi.fuses[i];
+      Serial.print("0x");
+      Serial.print(old_fuses[i], HEX);
+      Serial.print(", ");
+    }
+
+    if (num == (AVR_FUSE_LOCK - AVR_FUSE_BASE)) {
+	Serial.println("Nope: we are not going to let you change the lock bits\n");
+	return false;
+    }
+
+    g_updi.fuses[num] = fuse;
+
+    Serial.printf("\nWriting fuse #%d -> 0x%02x\n", num, fuse);
+    if (!updi_run_tasks(UPDI_TASK_WRITE_FUSES, NULL)) {
       return false;
     }
+
+    return true;
+#endif
+  } else {
+    return false;
   }
-  busyWait();
-  Serial.println();
-  endProgramMode();
-  return true;
 }
 
 /**************************************************************************/
