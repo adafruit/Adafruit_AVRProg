@@ -76,7 +76,8 @@ void Adafruit_AVRProg::updi_serial_init() {
   _updi_serial_retry_counter = 0;
   _updi_serial_retry_count = 0;
 
-  uart->begin(_baudrate, SERIAL_8E2);
+  // start slow
+  uart->begin(min((uint32_t)_baudrate, (uint32_t)57600), SERIAL_8E2);
   uart->setTimeout(10);
   DEBUG_PHYSICAL("updi serial init set\n");
 
@@ -450,9 +451,9 @@ void Adafruit_AVRProg::updi_serial_force_break(void) {
 bool Adafruit_AVRProg::updi_init(bool force) {
   if (force && (_power >= 0)) {
     pinMode(_power, OUTPUT);
-    digitalWrite(_power, LOW);
+    digitalWrite(_power, _invertpower);
     delay(10);
-    digitalWrite(_power, HIGH);
+    digitalWrite(_power, !_invertpower);
     delay(10);
   }
   updi_serial_init();
@@ -461,6 +462,11 @@ bool Adafruit_AVRProg::updi_init(bool force) {
 
   udpi_stcs(UPDI_CS_CTRLB, 1 << UPDI_CTRLB_CCDETDIS_BIT);
   udpi_stcs(UPDI_CS_CTRLA, 1 << UPDI_CTRLA_IBDLY_BIT);
+  if (_baudrate > 230000) {
+    udpi_stcs(UPDI_ASI_CTRLA, 0x1); // set 16mhz for higher baudrate!
+  }
+  uart->begin(_baudrate, SERIAL_8E2);
+
   return updi_check();
 }
 
@@ -827,6 +833,65 @@ void Adafruit_AVRProg::updi_leave_progmode() {
   return;
 }
 
+/**************************************************************************/
+/*!
+    @brief  Perform a quick UPDI unlock/erase cycle (for post-fuse writes)
+    @returns UPDI command success status
+*/
+/**************************************************************************/
+bool Adafruit_AVRProg::UPDIunlock(void) {
+  bool success;
+
+  updi_init(true);
+
+  if (!updi_check()) {
+    DEBUG_TASK("UPDI not initialised\n");
+
+    if (!updi_device_force_reset()) {
+      DEBUG_TASK("double BREAK reset failed\n");
+      success = false;
+      return false;
+    }
+    updi_init(false); // re-init the UPDI interface
+
+    if (!updi_check()) {
+      DEBUG_PHYSICAL("Cannot initialise UPDI, aborting.\n");
+      // TODO find out why these are not already correct
+      g_updi.initialized = false;
+      g_updi.unlocked = false;
+      success = false;
+      return false;
+    } else {
+      DEBUG_PHYSICAL("UPDI INITIALISED\n");
+      g_updi.initialized = true;
+    }
+  } else {
+    DEBUG_PHYSICAL("UPDI ALREADY INITIALISED\n");
+    g_updi.initialized = true;
+  }
+
+  if (updi_ldcs(UPDI_ASI_SYS_STATUS) & (1 << UPDI_ASI_SYS_STATUS_LOCKSTATUS)) {
+    Serial.println("We are in fact locked");
+  }
+
+  // enter key
+  updi_write_key(UPDI_KEY_64, (uint8_t *)UPDI_KEY_CHIPERASE);
+
+  // updi_check key status
+  uint8_t key_status = updi_ldcs(UPDI_ASI_KEY_STATUS);
+  if (!(key_status & (1 << UPDI_ASI_KEY_STATUS_CHIPERASE))) {
+    DEBUG_VERBOSE("Unlock error: key not accepted\n");
+    return false;
+  }
+  Serial.println("Unlock key inserted");
+
+  updi_apply_reset();
+
+  updi_wait_unlocked(500);
+
+  return true;
+}
+
 // Unlock and erase
 bool Adafruit_AVRProg::updi_unlock_device() {
   DEBUG_VERBOSE("UNLOCKING AND ERASING\n");
@@ -850,7 +915,7 @@ bool Adafruit_AVRProg::updi_unlock_device() {
   updi_apply_reset();
 
   // wait for unlock
-  if (!updi_wait_unlocked(100)) {
+  if (!updi_wait_unlocked(500)) {
     DEBUG_VERBOSE("Failed to chip erase using key\n");
     return false;
   }
@@ -1282,7 +1347,7 @@ bool Adafruit_AVRProg::updi_write_nvm(uint32_t address, uint8_t *data,
                                       uint32_t len, uint8_t command,
                                       bool use_word_acess, bool block_on_flash,
                                       bool verify) {
-  uint32_t t = millis();
+  // uint32_t t = millis();
 
   // wait for NVM controller to be ready
   if (!updi_wait_flash_ready()) {

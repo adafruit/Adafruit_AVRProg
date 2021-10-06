@@ -20,13 +20,13 @@
 
 /**! Struct for holding one 'program' fuses & code */
 typedef struct image {
-  char image_name[30];     ///< i.e. "optiboot_diecimila.hex"
-  char image_chipname[12]; ///< i.e. "atmega168"
-  uint16_t image_chipsig;  ///< Low two bytes of signature, check datasheet!
-  byte image_progfuses[5]; ///< fuses to set during programming (e.g unlock)
-  byte image_normfuses[5]; ///< fuses to set after programming (e.g lock)
-  byte fusemask[4]; ///< Not all bits are used in the fuses, mask the ones we do
-                    ///< use
+  char image_name[30];      ///< i.e. "optiboot_diecimila.hex"
+  char image_chipname[12];  ///< i.e. "atmega168"
+  uint16_t image_chipsig;   ///< Low two bytes of signature, check datasheet!
+  byte image_progfuses[10]; ///< fuses to set during programming (e.g unlock)
+  byte image_normfuses[10]; ///< fuses to set after programming (e.g lock)
+  byte fusemask[10];   ///< Not all bits are used in the fuses, mask the ones we
+                       ///< do use
   uint16_t chipsize;   ///< Total size for flash programming, in bytes. check
                        ///< datasheet!
   byte image_pagesize; ///< Page size for flash programming, in bytes. check
@@ -56,7 +56,9 @@ public:
   bool eraseChip(void);
 
   bool readFuses(byte *fuses, uint8_t numbytes);
-  bool programFuses(const byte *fuses);
+  bool programFuses(const byte *fuses, uint8_t num_fuses = 5);
+  bool programFuse(byte fuse, uint8_t num);
+
   bool verifyFuses(const byte *fuses, const byte *fusemask);
 
   bool writeImage(const byte *hextext, uint32_t pagesize, uint32_t chipsize);
@@ -67,8 +69,10 @@ public:
               int8_t miso_pin);
 
   void setUPDI(HardwareSerial *theUART, uint32_t baudrate,
-               int8_t power_pin = -1);
+               int8_t power_pin = -1, bool invertpower = false);
 #ifdef SUPPORT_UPDI
+  bool UPDIunlock();
+
 private:
   void updi_serial_init(void);
   int updi_serial_read_wait(void);
@@ -116,7 +120,6 @@ private:
   bool updi_progmode_key();
   bool updi_enter_progmode();
   void updi_leave_progmode();
-
   bool updi_unlock_device();
   bool updi_get_device_info();
 
@@ -151,6 +154,10 @@ public:
   void error(const char *string);
   void error(const __FlashStringHelper *string);
 
+#ifdef SUPPORT_UPDI
+  UPDI g_updi; ///< Global UPDI status
+#endif
+
 private:
   bool startProgramMode(uint32_t clockrate = 100000);
   void endProgramMode(void);
@@ -174,12 +181,12 @@ private:
 
   HardwareSerial *uart = NULL;
   int8_t _power = -1;
+  bool _invertpower = false;
   uint32_t _baudrate;
 #ifdef SUPPORT_UPDI
   uint8_t _updi_serial_retry_counter = 0; // resets after success or failure
   uint16_t _updi_serial_retry_count = 0;  // used for diagnostics
   bool _updi_serial_inited = false;
-  UPDI g_updi;
 #endif
 };
 
