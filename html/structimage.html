@@ -82,16 +82,16 @@ char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#aa607361d850f52a93bf7126f3b7fab53">image_chipsig</a></td></tr>
 <tr class="memdesc:aa607361d850f52a93bf7126f3b7fab53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Low two bytes of signature, check datasheet! <br /></td></tr>
 <tr class="separator:aa607361d850f52a93bf7126f3b7fab53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a886607fda3b6975b0c0c7dffb13c78ea"><td class="memItemLeft" align="right" valign="top"><a id="a886607fda3b6975b0c0c7dffb13c78ea"></a>
-byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#a886607fda3b6975b0c0c7dffb13c78ea">image_progfuses</a> [5]</td></tr>
-<tr class="memdesc:a886607fda3b6975b0c0c7dffb13c78ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">fuses to set during programming (e.g unlock) <br /></td></tr>
-<tr class="separator:a886607fda3b6975b0c0c7dffb13c78ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3be228290a0cf33bf76c0ffe1e6ad53b"><td class="memItemLeft" align="right" valign="top"><a id="a3be228290a0cf33bf76c0ffe1e6ad53b"></a>
-byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#a3be228290a0cf33bf76c0ffe1e6ad53b">image_normfuses</a> [5]</td></tr>
-<tr class="memdesc:a3be228290a0cf33bf76c0ffe1e6ad53b"><td class="mdescLeft">&#160;</td><td class="mdescRight">fuses to set after programming (e.g lock) <br /></td></tr>
-<tr class="separator:a3be228290a0cf33bf76c0ffe1e6ad53b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af09e2fd6ad2fe6cb8e406754b61434b6"><td class="memItemLeft" align="right" valign="top">byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#af09e2fd6ad2fe6cb8e406754b61434b6">fusemask</a> [4]</td></tr>
-<tr class="separator:af09e2fd6ad2fe6cb8e406754b61434b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1701b0145eef218f0eaeec550cbd2533"><td class="memItemLeft" align="right" valign="top"><a id="a1701b0145eef218f0eaeec550cbd2533"></a>
+byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#a1701b0145eef218f0eaeec550cbd2533">image_progfuses</a> [10]</td></tr>
+<tr class="memdesc:a1701b0145eef218f0eaeec550cbd2533"><td class="mdescLeft">&#160;</td><td class="mdescRight">fuses to set during programming (e.g unlock) <br /></td></tr>
+<tr class="separator:a1701b0145eef218f0eaeec550cbd2533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af64a6b7891f13c8d1c993d8772bea41b"><td class="memItemLeft" align="right" valign="top"><a id="af64a6b7891f13c8d1c993d8772bea41b"></a>
+byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#af64a6b7891f13c8d1c993d8772bea41b">image_normfuses</a> [10]</td></tr>
+<tr class="memdesc:af64a6b7891f13c8d1c993d8772bea41b"><td class="mdescLeft">&#160;</td><td class="mdescRight">fuses to set after programming (e.g lock) <br /></td></tr>
+<tr class="separator:af64a6b7891f13c8d1c993d8772bea41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad73297d18eccf9b2570f1c9b860133a0"><td class="memItemLeft" align="right" valign="top">byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#ad73297d18eccf9b2570f1c9b860133a0">fusemask</a> [10]</td></tr>
+<tr class="separator:ad73297d18eccf9b2570f1c9b860133a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f6e2bf5d14420ae65d48cc8d5f7a823"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#a1f6e2bf5d14420ae65d48cc8d5f7a823">chipsize</a></td></tr>
 <tr class="separator:a1f6e2bf5d14420ae65d48cc8d5f7a823"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d2c1bad81300e1297731d5295beea60"><td class="memItemLeft" align="right" valign="top">byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structimage.html#a0d2c1bad81300e1297731d5295beea60">image_pagesize</a></td></tr>
@@ -104,14 +104,14 @@ byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>! Struct for holding one 'program' fuses &amp; code </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="af09e2fd6ad2fe6cb8e406754b61434b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af09e2fd6ad2fe6cb8e406754b61434b6">&#9670;&nbsp;</a></span>fusemask</h2>
+<a id="ad73297d18eccf9b2570f1c9b860133a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad73297d18eccf9b2570f1c9b860133a0">&#9670;&nbsp;</a></span>fusemask</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">byte image::fusemask[4]</td>
+          <td class="memname">byte image::fusemask[10]</td>
         </tr>
       </table>
 </div><div class="memdoc">

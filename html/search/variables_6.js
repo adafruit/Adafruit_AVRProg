@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nvm_5fversion',['nvm_version',['../struct_device_details.html#aecce49a69b6593d771196455b88cc9b7',1,'DeviceDetails']]]
+  ['longname',['longname',['../struct_device_identification.html#a5a8464fd003c4ffb0acbf5e1cdfe635f',1,'DeviceIdentification']]]
 ];

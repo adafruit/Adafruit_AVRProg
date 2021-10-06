@@ -60,6 +60,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_adafruit___a_v_r_prog-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">Adafruit_AVRProg Class Reference</div>  </div>
@@ -84,11 +85,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a13311473bb0e9192a640c5a5f824094a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the erase command, then busy wait until the chip is erased.  <a href="#a13311473bb0e9192a640c5a5f824094a">More...</a><br /></td></tr>
 <tr class="separator:a13311473bb0e9192a640c5a5f824094a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6bd8595158b4439f5901eb648e0d8d2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#ae6bd8595158b4439f5901eb648e0d8d2">readFuses</a> (byte *fuses, uint8_t numbytes)</td></tr>
-<tr class="memdesc:ae6bd8595158b4439f5901eb648e0d8d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the fuses on a device.  <a href="#ae6bd8595158b4439f5901eb648e0d8d2">More...</a><br /></td></tr>
+<tr class="memdesc:ae6bd8595158b4439f5901eb648e0d8d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the fuses on a device.  <a href="#ae6bd8595158b4439f5901eb648e0d8d2">More...</a><br /></td></tr>
 <tr class="separator:ae6bd8595158b4439f5901eb648e0d8d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a667fa9e374ab3ad0d8cb20c1ffc1fd37">programFuses</a> (const byte *fuses)</td></tr>
-<tr class="memdesc:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the fuses on a device.  <a href="#a667fa9e374ab3ad0d8cb20c1ffc1fd37">More...</a><br /></td></tr>
-<tr class="separator:a667fa9e374ab3ad0d8cb20c1ffc1fd37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef996c132c7b91a07ffa7a24923c040e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#aef996c132c7b91a07ffa7a24923c040e">programFuses</a> (const byte *fuses, uint8_t num_fuses=5)</td></tr>
+<tr class="memdesc:aef996c132c7b91a07ffa7a24923c040e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program the fuses on a device.  <a href="#aef996c132c7b91a07ffa7a24923c040e">More...</a><br /></td></tr>
+<tr class="separator:aef996c132c7b91a07ffa7a24923c040e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4d92f9469400cf9035021fa4a3de29e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#aa4d92f9469400cf9035021fa4a3de29e">programFuse</a> (byte fuse, uint8_t num)</td></tr>
+<tr class="memdesc:aa4d92f9469400cf9035021fa4a3de29e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program a single fuse (currently for <a class="el" href="struct_u_p_d_i.html">UPDI</a> only)  <a href="#aa4d92f9469400cf9035021fa4a3de29e">More...</a><br /></td></tr>
+<tr class="separator:aa4d92f9469400cf9035021fa4a3de29e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a934fd65ce285febcde9281d575855728"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728">verifyFuses</a> (const byte *fuses, const byte *fusemask)</td></tr>
 <tr class="memdesc:a934fd65ce285febcde9281d575855728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the fuses are set to what we expect.  <a href="#a934fd65ce285febcde9281d575855728">More...</a><br /></td></tr>
 <tr class="separator:a934fd65ce285febcde9281d575855728"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,9 +108,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a6fb760db5f9a1e5660bfd83e7448d20f">setSPI</a> (int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin, int8_t miso_pin)</td></tr>
 <tr class="memdesc:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure a software SPI interface, plus one reset pin.  <a href="#a6fb760db5f9a1e5660bfd83e7448d20f">More...</a><br /></td></tr>
 <tr class="separator:a6fb760db5f9a1e5660bfd83e7448d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cb136948a665297e165ea8f808e31f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a6cb136948a665297e165ea8f808e31f0">setUPDI</a> (HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin=-1)</td></tr>
-<tr class="memdesc:a6cb136948a665297e165ea8f808e31f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up programming to use <a class="el" href="struct_u_p_d_i.html">UPDI</a> interface.  <a href="#a6cb136948a665297e165ea8f808e31f0">More...</a><br /></td></tr>
-<tr class="separator:a6cb136948a665297e165ea8f808e31f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ec27d7466233a186d34d6769ffad095"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a8ec27d7466233a186d34d6769ffad095">setUPDI</a> (HardwareSerial *theUART, uint32_t baudrate, int8_t power_pin=-1, bool invertpower=false)</td></tr>
+<tr class="memdesc:a8ec27d7466233a186d34d6769ffad095"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up programming to use <a class="el" href="struct_u_p_d_i.html">UPDI</a> interface.  <a href="#a8ec27d7466233a186d34d6769ffad095">More...</a><br /></td></tr>
+<tr class="separator:a8ec27d7466233a186d34d6769ffad095"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39ca8e10b178db0980eed92f0a689a09"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a39ca8e10b178db0980eed92f0a689a09">UPDIunlock</a> ()</td></tr>
+<tr class="memdesc:a39ca8e10b178db0980eed92f0a689a09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a quick <a class="el" href="struct_u_p_d_i.html">UPDI</a> unlock/erase cycle (for post-fuse writes)  <a href="#a39ca8e10b178db0980eed92f0a689a09">More...</a><br /></td></tr>
+<tr class="separator:a39ca8e10b178db0980eed92f0a689a09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfdb5a9af9854ccadd458cfba2416e63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#abfdb5a9af9854ccadd458cfba2416e63">setProgramLED</a> (uint8_t led)</td></tr>
 <tr class="memdesc:abfdb5a9af9854ccadd458cfba2416e63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a GPIO as a programming-indicator LED.  <a href="#abfdb5a9af9854ccadd458cfba2416e63">More...</a><br /></td></tr>
 <tr class="separator:abfdb5a9af9854ccadd458cfba2416e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,6 +142,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a2171f29d53a44a86ce8ac107ce11d9b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a2171f29d53a44a86ce8ac107ce11d9b8">error</a> (const __FlashStringHelper *string)</td></tr>
 <tr class="memdesc:a2171f29d53a44a86ce8ac107ce11d9b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print an error, turn on the error LED and halt!  <a href="#a2171f29d53a44a86ce8ac107ce11d9b8">More...</a><br /></td></tr>
 <tr class="separator:a2171f29d53a44a86ce8ac107ce11d9b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a6ffa0c1c3085a143513fe738b8d90e28"><td class="memItemLeft" align="right" valign="top"><a id="a6ffa0c1c3085a143513fe738b8d90e28"></a>
+<a class="el" href="struct_u_p_d_i.html">UPDI</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_v_r_prog.html#a6ffa0c1c3085a143513fe738b8d90e28">g_updi</a></td></tr>
+<tr class="memdesc:a6ffa0c1c3085a143513fe738b8d90e28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global <a class="el" href="struct_u_p_d_i.html">UPDI</a> status. <br /></td></tr>
+<tr class="separator:a6ffa0c1c3085a143513fe738b8d90e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for talking to an AVR chip with SPI to program flash and fuses. </p>
@@ -223,7 +237,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 
-<p>Program the fuses on a device. </p>
+<p>Read the fuses on a device. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">fuses</td><td>Pointer to 4-byte array of fuses </td></tr>
@@ -235,8 +249,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="a667fa9e374ab3ad0d8cb20c1ffc1fd37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a667fa9e374ab3ad0d8cb20c1ffc1fd37">&#9670;&nbsp;</a></span>programFuses()</h2>
+<a id="aef996c132c7b91a07ffa7a24923c040e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef996c132c7b91a07ffa7a24923c040e">&#9670;&nbsp;</a></span>programFuses()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -245,8 +259,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="memname">bool Adafruit_AVRProg::programFuses </td>
           <td>(</td>
           <td class="paramtype">const byte *&#160;</td>
-          <td class="paramname"><em>fuses</em></td><td>)</td>
+          <td class="paramname"><em>fuses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>num_fuses</em> = <code>5</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -254,11 +278,50 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Program the fuses on a device. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fuses</td><td>Pointer to 4-byte array of fuses </td></tr>
+    <tr><td class="paramname">fuses</td><td>Pointer to byte array of fuses </td></tr>
+    <tr><td class="paramname">num_fuses</td><td>How many fuses are in the fusearray </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if we were able to send data and get a response from the chip. You could still run <a class="el" href="class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728" title="Verify the fuses are set to what we expect. ">verifyFuses()</a> afterwards! </dd></dl>
+
+</div>
+</div>
+<a id="aa4d92f9469400cf9035021fa4a3de29e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4d92f9469400cf9035021fa4a3de29e">&#9670;&nbsp;</a></span>programFuse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AVRProg::programFuse </td>
+          <td>(</td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>fuse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>num</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Program a single fuse (currently for <a class="el" href="struct_u_p_d_i.html">UPDI</a> only) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fuse</td><td>Value to write </td></tr>
+    <tr><td class="paramname">num</td><td>Fuse address offset (start at 0) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="struct_u_p_d_i.html">UPDI</a> command success status </dd></dl>
 
 </div>
 </div>
@@ -460,8 +523,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="a6cb136948a665297e165ea8f808e31f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6cb136948a665297e165ea8f808e31f0">&#9670;&nbsp;</a></span>setUPDI()</h2>
+<a id="a8ec27d7466233a186d34d6769ffad095"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ec27d7466233a186d34d6769ffad095">&#9670;&nbsp;</a></span>setUPDI()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -482,7 +545,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>power_pin</em> = <code>-1</code>&#160;</td>
+          <td class="paramname"><em>power_pin</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>invertpower</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -498,9 +567,31 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
     <tr><td class="paramname">theSerial</td><td>Hardware serial interface (CANNOT use software serial!) </td></tr>
     <tr><td class="paramname">baudrate</td><td>Try 115200 or less to start </td></tr>
     <tr><td class="paramname">power_pin</td><td>pin connected to target chip power (can help with <a class="el" href="struct_u_p_d_i.html">UPDI</a> since theres no reset line) </td></tr>
+    <tr><td class="paramname">invertpower</td><td>Set true if the power pin is low to enable target </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a39ca8e10b178db0980eed92f0a689a09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39ca8e10b178db0980eed92f0a689a09">&#9670;&nbsp;</a></span>UPDIunlock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AVRProg::UPDIunlock </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Perform a quick <a class="el" href="struct_u_p_d_i.html">UPDI</a> unlock/erase cycle (for post-fuse writes) </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="struct_u_p_d_i.html">UPDI</a> command success status </dd></dl>
 
 </div>
 </div>

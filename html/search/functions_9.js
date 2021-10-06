@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['writebytetoflash',['writeByteToFlash',['../class_adafruit___a_v_r_prog.html#a68d97dc5cd6dbac0b0ad80ac2b09486a',1,'Adafruit_AVRProg']]],
-  ['writeimage',['writeImage',['../class_adafruit___a_v_r_prog.html#ad99bdde99a9d06689c0e7c95d8d56eb2',1,'Adafruit_AVRProg']]]
+  ['verifyfuses',['verifyFuses',['../class_adafruit___a_v_r_prog.html#a934fd65ce285febcde9281d575855728',1,'Adafruit_AVRProg']]],
+  ['verifyimage',['verifyImage',['../class_adafruit___a_v_r_prog.html#aab5693e13b97c7d8cd3c07a80b6b0fed',1,'Adafruit_AVRProg']]]
 ];
