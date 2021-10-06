@@ -58,6 +58,7 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
     @param  baudrate Try 115200 or less to start
     @param  power_pin pin connected to target chip power (can help with UPDI
    since theres no reset line)
+    @param invertpower Set true if the power pin is low to enable target
 */
 /**************************************************************************/
 void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate,
@@ -288,7 +289,8 @@ bool Adafruit_AVRProg::readFuses(byte *fuses, uint8_t numbytes) {
 /**************************************************************************/
 /*!
     @brief    Program the fuses on a device
-    @param    fuses Pointer to 4-byte array of fuses
+    @param    fuses Pointer to byte array of fuses
+    @param    num_fuses How many fuses are in the fusearray
     @return True if we were able to send data and get a response from the chip.
     You could still run verifyFuses() afterwards!
 */
@@ -313,10 +315,11 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
       Serial.print(", ");
     }
 
-    for (uint8_t f=0; f<num_fuses; f++) {
+    for (uint8_t f = 0; f < num_fuses; f++) {
       if (f == (AVR_FUSE_LOCK - AVR_FUSE_BASE)) {
-	Serial.println("Nope: we are not going to let you change the lock bits\n");
-	continue;
+        Serial.println(
+            "Nope: we are not going to let you change the lock bits\n");
+        continue;
       }
 
       g_updi.fuses[f] = fuses[f];
@@ -332,13 +335,13 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
 
     byte f;
     Serial.println(F("\nSetting fuses"));
-    
+
     f = pgm_read_byte(&fuses[FUSE_PROT]);
     if (f) {
       Serial.print(F("\tSet Lock Fuse to: "));
       Serial.println(f, HEX);
       if ((isp_transaction(0xAC, 0xE0, 0x00, f) & 0xFFFF) != 0xE000) {
-	return false;
+        return false;
       }
     }
     busyWait();
@@ -347,7 +350,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
       Serial.print(F("\tSet Low Fuse to: "));
       Serial.println(f, HEX);
       if ((isp_transaction(0xAC, 0xA0, 0x00, f) & 0xFFFF) != 0xA000) {
-	return false;
+        return false;
       }
     }
     busyWait();
@@ -356,7 +359,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
       Serial.print(F("\tSet High Fuse to: "));
       Serial.println(f, HEX);
       if ((isp_transaction(0xAC, 0xA8, 0x00, f) & 0xFFFF) != 0xA800) {
-	return false;
+        return false;
       }
     }
     busyWait();
@@ -365,7 +368,7 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
       Serial.print(F("\tSet Ext Fuse to: "));
       Serial.println(f, HEX);
       if ((isp_transaction(0xAC, 0xA4, 0x00, f) & 0xFFFF) != 0xA400) {
-	return false;
+        return false;
       }
     }
     busyWait();
@@ -375,6 +378,14 @@ bool Adafruit_AVRProg::programFuses(const byte *fuses, uint8_t num_fuses) {
   }
 }
 
+/**************************************************************************/
+/*!
+    @brief    Program a single fuse (currently for UPDI only)
+    @param    fuse Value to write
+    @param    num Fuse address offset (start at 0)
+    @return  UPDI command success status
+*/
+/**************************************************************************/
 bool Adafruit_AVRProg::programFuse(byte fuse, uint8_t num) {
   if (uart) {
 #ifndef SUPPORT_UPDI
@@ -394,8 +405,9 @@ bool Adafruit_AVRProg::programFuse(byte fuse, uint8_t num) {
     }
 
     if (num == (AVR_FUSE_LOCK - AVR_FUSE_BASE)) {
-	Serial.println("Nope: we are not going to let you change the lock bits\n");
-	return false;
+      Serial.println(
+          "Nope: we are not going to let you change the lock bits\n");
+      return false;
     }
 
     g_updi.fuses[num] = fuse;

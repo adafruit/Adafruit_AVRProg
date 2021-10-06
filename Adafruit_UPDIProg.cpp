@@ -833,22 +833,27 @@ void Adafruit_AVRProg::updi_leave_progmode() {
   return;
 }
 
-
-bool Adafruit_AVRProg::unlocky(void) {
+/**************************************************************************/
+/*!
+    @brief  Perform a quick UPDI unlock/erase cycle (for post-fuse writes)
+    @returns UPDI command success status
+*/
+/**************************************************************************/
+bool Adafruit_AVRProg::UPDIunlock(void) {
   bool success;
 
   updi_init(true);
 
   if (!updi_check()) {
     DEBUG_TASK("UPDI not initialised\n");
-    
+
     if (!updi_device_force_reset()) {
       DEBUG_TASK("double BREAK reset failed\n");
       success = false;
       return false;
     }
     updi_init(false); // re-init the UPDI interface
-    
+
     if (!updi_check()) {
       DEBUG_PHYSICAL("Cannot initialise UPDI, aborting.\n");
       // TODO find out why these are not already correct
@@ -865,8 +870,7 @@ bool Adafruit_AVRProg::unlocky(void) {
     g_updi.initialized = true;
   }
 
-
-  if (updi_ldcs(UPDI_ASI_SYS_STATUS) & (1<<UPDI_ASI_SYS_STATUS_LOCKSTATUS)) {
+  if (updi_ldcs(UPDI_ASI_SYS_STATUS) & (1 << UPDI_ASI_SYS_STATUS_LOCKSTATUS)) {
     Serial.println("We are in fact locked");
   }
 
@@ -880,7 +884,7 @@ bool Adafruit_AVRProg::unlocky(void) {
     return false;
   }
   Serial.println("Unlock key inserted");
-  
+
   updi_apply_reset();
 
   updi_wait_unlocked(500);
