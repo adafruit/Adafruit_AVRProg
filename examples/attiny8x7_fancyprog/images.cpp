@@ -12,12 +12,14 @@ const image_t PROGMEM image_817 = {
     {0x00, 0x00, 0x00, 0x00}, // {lock, low, high, extended}
     // Normal fuses, written after writing to flash (but before
     // verifying). Fuses set to zero are untouched.
-    {0x0, 0x0, 0x2, 0xFF, 0x0, 0xC5, 0x04, 0x00, 0x00, 0xFF}, // {lock, low, high, extended}
+    {0x0, 0x0, 0x2, 0xFF, 0x0, 0xC5, 0x04, 0x00, 0x00,
+     0xFF}, // {lock, low, high, extended}
     // Fuse verify mask. Any bits set to zero in these values are
     // ignored while verifying the fuses after writing them. All (and
     // only) bits that are unused for this atmega chip should be zero
     // here.
-    {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // {lock, low, high, extended}
+    {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     0xFF}, // {lock, low, high, extended}
     // size of chip flash in bytes
     8192,
     // size in bytes of flash page
