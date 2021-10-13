@@ -100,10 +100,10 @@ void setup() {
 
   bool wrotefuse = false;
   for (uint8_t f=0; f<10; f++) {
-    Serial.printf("Fuse #%d = 0x%02X", f, fuses[f]);
+    //Serial.printf("Fuse #%d = 0x%02X", f, fuses[f]);
     uint8_t newfuse = targetimage->image_normfuses[f];
     if (newfuse != fuses[f]) {
-      Serial.printf(" -> 0x%02X\n", newfuse);
+      //Serial.printf(" -> 0x%02X\n", newfuse);
       wrotefuse = true;
       if (! avrprog.programFuse(newfuse, f)) {
         pixel.setPixelColor(0, 0xFF0000); pixel.show();
