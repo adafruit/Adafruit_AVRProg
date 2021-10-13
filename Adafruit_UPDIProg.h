@@ -31,9 +31,9 @@ SOFTWARE.
 
 #if defined(__AVR__) || defined(ESP8266) ||                                    \
     (defined(ARDUINO_ARCH_SAMD) && !defined(ARDUINO_SAMD_ADAFRUIT))
-#pragma message("UPDI Support NOT included")
+//#pragma message("UPDI Support NOT included")
 #else
-#pragma message("UPDI Support included")
+//#pragma message("UPDI Support included")
 #define SUPPORT_UPDI
 #endif
 
