@@ -54,6 +54,9 @@ SOFTWARE.
 //#define DEBUG_PHYSICAL(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
 #define DEBUG_PHYSICAL(fmt, ...) {}
 
+#define DEBUG_FUSES(fmt, ...)	Serial.printf(fmt, ##__VA_ARGS__)
+//#define DEBUG_FUSES(fmt, ...) {}
+
 // clang-format on
 
 #define UPDI_BREAK 0x00
