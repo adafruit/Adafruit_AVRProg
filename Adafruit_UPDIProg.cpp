@@ -485,6 +485,7 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t *data,
   uint8_t saved_fuses[AVR_NUM_FUSES];
   if (tasks & UPDI_TASK_WRITE_FUSES) {
     // we need to preserve the fuses through the device setup process
+    // g_updi.fuses contains the new fuse values
     for (uint8_t i = 0; i < AVR_NUM_FUSES; i++)
       saved_fuses[i] = g_updi.fuses[i];
   }
@@ -570,8 +571,10 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t *data,
       // info was previously fetched for all operations
     }
 
-    // save fuses into updi array
-    if (tasks & UPDI_TASK_READ_FUSES) {
+    // save fuses into updi array, also read before writing the fuses
+    // to determine which ones actually need to be changed
+    // New fuse values have been saved in saved_fuses on function entry
+    if ((tasks & UPDI_TASK_READ_FUSES) || (tasks & UPDI_TASK_WRITE_FUSES)) {
       Serial.printf("Reading fuses\n");
 
       for (uint8_t i = 0; i < AVR_NUM_FUSES; i++) {
@@ -584,8 +587,18 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t *data,
     if (tasks & UPDI_TASK_WRITE_FUSES) {
       Serial.printf("Writing fuses\n");
 
+      // Only write fuses whose value needs to be changed
+      // Especially important for lockbits, as writing any value
+      // to lockbits (including 'valid key' 0xC5) seems to lock the device
       for (uint8_t i = 0; i < AVR_NUM_FUSES; i++) {
-        updi_write_fuse(i, saved_fuses[i]);
+        if (saved_fuses[i] != g_updi.fuses[i]) {
+          DEBUG_FUSES("Write fuse %d: 0x%02X -> 0x%02X\n", i, g_updi.fuses[i],
+                      saved_fuses[i]);
+          updi_write_fuse(i, saved_fuses[i]);
+        } else {
+          DEBUG_FUSES("Skip fuse %d: 0x%02X -> 0x%02X\n", i, g_updi.fuses[i],
+                      saved_fuses[i]);
+        }
       }
     }
 
@@ -1032,6 +1045,9 @@ uint8_t Adafruit_AVRProg::updi_read_fuse(uint8_t fuse) {
 // Writes one fuse value
 bool Adafruit_AVRProg::updi_write_fuse(uint8_t fuse, uint8_t value) {
   uint8_t data;
+
+  DEBUG_FUSES("updi_write_fuse: fuse %d value 0x%02X\n", fuse, value);
+  // Serial.print("Write fuse "); Serial.println(fuse, DEC);
 
   if (!updi_is_prog_mode()) {
     DEBUG_VERBOSE("in updi_write_fuse() error: not in prog mode\n");
