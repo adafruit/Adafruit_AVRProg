@@ -8,6 +8,8 @@ static byte pageBuffer[128]; /* One page of flash */
 static byte pageBuffer[8 * 1024]; // we can megabuff
 #endif
 
+static bool isUPDIchip = false;
+
 /**************************************************************************/
 /*!
     @brief  Instantiate a new programmer, no pins are defined to start
@@ -31,6 +33,7 @@ Adafruit_AVRProg::Adafruit_AVRProg() {
 void Adafruit_AVRProg::setSPI(int8_t reset_pin, SPIClass *theSPI) {
   _reset = reset_pin;
   spi = theSPI;
+  isUPDIchip = false;
 }
 
 /**************************************************************************/
@@ -49,6 +52,7 @@ void Adafruit_AVRProg::setSPI(int8_t reset_pin, int8_t sck_pin, int8_t mosi_pin,
   _mosi = mosi_pin;
   _miso = miso_pin;
   _sck = sck_pin;
+  isUPDIchip = false;
 }
 
 /**************************************************************************/
@@ -67,6 +71,7 @@ void Adafruit_AVRProg::setUPDI(HardwareSerial *theSerial, uint32_t baudrate,
   _baudrate = baudrate;
   _power = power_pin;
   _invertpower = invertpower;
+  isUPDIchip = true;
 }
 
 /**************************************************************************/
@@ -160,7 +165,7 @@ bool Adafruit_AVRProg::startProgramMode(uint32_t clockspeed) {
       debug(F("Using hardware SPI"));
       spi->begin();
       spi->beginTransaction(SPISettings(clockspeed, MSBFIRST, SPI_MODE0));
-    } else if (_sck > 0 && _mosi > 0 && _miso > 0) {
+    } else if ((_sck >= 0) && (_mosi >= 0) && (_miso >= 0)) {
       debug(F("Using software SPI"));
       pinMode(_sck, OUTPUT);
       digitalWrite(_sck, LOW);
@@ -493,7 +498,9 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
                                   uint32_t chipsize) {
   uint32_t flash_start = 0;
 #ifdef SUPPORT_UPDI
-  flash_start = g_updi.config->flash_start;
+  if (isUPDIchip) {
+    flash_start = g_updi.config->flash_start;
+  }
 #endif
 
   uint32_t pageaddr = 0;
@@ -503,6 +510,8 @@ bool Adafruit_AVRProg::writeImage(const byte *hextext, uint32_t pagesize,
   Serial.println(chipsize, DEC);
   Serial.print(F("Page size: "));
   Serial.println(pagesize, DEC);
+  Serial.print(F("Flash start: "));
+  Serial.println(flash_start, DEC);
 #endif
 
   while (pageaddr < chipsize && hextext) {
@@ -762,7 +771,9 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         Serial.print(lineaddr, HEX);
         Serial.print(":0x");
         Serial.print(b, HEX);
-        Serial.write(" ? ");
+        Serial.print(", ");
+        if (lineaddr % 16 == 0) Serial.println();
+
 #endif
 
         // verify this byte!
@@ -773,6 +784,7 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
           reply = isp_transaction(0x20, lineaddr >> 9, lineaddr / 2, 0) & 0xFF;
         }
         if (b != reply) {
+          Serial.println();
           Serial.print(F("Verification error at address 0x"));
           Serial.print(lineaddr, HEX);
           Serial.print(F(" Should be 0x"));

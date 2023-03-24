@@ -13,7 +13,7 @@
 #define FUSE_HIGH 2 ///< High fuse
 #define FUSE_EXT 3  ///< Extended fuse
 
-//#define VERBOSE 1
+#define VERBOSE 0
 
 #define FUSE_CLOCKSPEED 10000    ///< Fuses need to be programmed slowly
 #define FLASH_CLOCKSPEED 1000000 ///< Once fuse'd you can flash fast!
@@ -33,8 +33,8 @@ typedef struct image {
                        ///< datasheet!
 #if defined(__SAMD21G18A__) || defined(__SAMD21E18A__) ||                      \
     defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32) ||              \
-    defined(__SAMD51__)
-  byte image_hexcode[60000]; ///< Max buffer for intel hex format image (text)
+  defined(__SAMD51__) || defined(ARDUINO_ARCH_RP2040)
+  byte image_hexcode[80000]; ///< Max buffer for intel hex format image (text)
 #else
   byte image_hexcode[10000]; ///< Max buffer for intel hex format image (text)
 #endif
