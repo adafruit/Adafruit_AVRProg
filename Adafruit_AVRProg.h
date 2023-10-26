@@ -31,7 +31,7 @@ typedef struct image {
                        ///< datasheet!
   byte image_pagesize; ///< Page size for flash programming, in bytes. check
                        ///< datasheet!
-#if defined(__SAMD21G18A__) || defined(__SAMD21E18A__) ||                      \
+#if defined(__SAMD21G18A__) || defined(__SAMD21E18A__) || defined(ARDUINO_ARCH_NRF52)   ||                   \
     defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32) ||              \
   defined(__SAMD51__) || defined(ARDUINO_ARCH_RP2040)
   byte image_hexcode[80000]; ///< Max buffer for intel hex format image (text)
