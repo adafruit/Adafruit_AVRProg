@@ -615,7 +615,7 @@ bool Adafruit_AVRProg::updi_run_tasks(uint16_t tasks, uint8_t *data,
 
     // Write flash from hex file
     if (tasks & UPDI_TASK_WRITE_FLASH) {
-      Serial.printf("delta: %d millis\n", millis() - start);
+      Serial.printf("delta: %lu millis\n", millis() - start);
       int16_t flashpagesize = g_updi.config->flash_pagesize;
       int32_t remainingsize = size;
 
@@ -853,8 +853,6 @@ void Adafruit_AVRProg::updi_leave_progmode() {
 */
 /**************************************************************************/
 bool Adafruit_AVRProg::UPDIunlock(void) {
-  bool success;
-
   updi_init(true);
 
   if (!updi_check()) {
@@ -862,7 +860,6 @@ bool Adafruit_AVRProg::UPDIunlock(void) {
 
     if (!updi_device_force_reset()) {
       DEBUG_TASK("double BREAK reset failed\n");
-      success = false;
       return false;
     }
     updi_init(false); // re-init the UPDI interface
@@ -872,7 +869,6 @@ bool Adafruit_AVRProg::UPDIunlock(void) {
       // TODO find out why these are not already correct
       g_updi.initialized = false;
       g_updi.unlocked = false;
-      success = false;
       return false;
     } else {
       DEBUG_PHYSICAL("UPDI INITIALISED\n");
@@ -1092,7 +1088,7 @@ bool Adafruit_AVRProg::updi_read_page(uint16_t address, uint16_t bufsize,
     return false;
   }
   if (bufsize > AVR_PAGESIZE_MAX) {
-    Serial.printf("Chip buffer %d bytes exceeds %s byte maximum\n", bufsize,
+    Serial.printf("Chip buffer %d bytes exceeds %d byte maximum\n", bufsize,
                   AVR_PAGESIZE_MAX);
     return false;
   }
@@ -1139,7 +1135,7 @@ bool Adafruit_AVRProg::updi_write_page(uint16_t address, uint16_t pagesize,
 
   // Serial.println(F("Is in prog mode"));
   if (pagesize > AVR_PAGESIZE_MAX) {
-    Serial.printf("Chip pagesize %d bytes exceeds %s byte maximum\n", pagesize,
+    Serial.printf("Chip pagesize %d bytes exceeds %d byte maximum\n", pagesize,
                   AVR_PAGESIZE_MAX);
     return false;
   }
@@ -1148,14 +1144,14 @@ bool Adafruit_AVRProg::updi_write_page(uint16_t address, uint16_t pagesize,
                 address); // deliberately no LF; the start + progress + finish
                           // messages are all combined
 
-  Serial.printf("before write: %d millis\n", millis() - t);
+  Serial.printf("before write: %lu millis\n", millis() - t);
   t = millis();
   if (!updi_write_nvm(address, pagedata, pagesize,
                       UPDI_NVMCTRL_CTRLA_updi_write_PAGE, true)) {
     Serial.printf(" Failed\n");
     return false;
   }
-  Serial.printf("updi_write_nvm: %d millis\n", millis() - t);
+  Serial.printf("updi_write_nvm: %lu millis\n", millis() - t);
 
   // Serial.printf("Finished\n");
   return true;
