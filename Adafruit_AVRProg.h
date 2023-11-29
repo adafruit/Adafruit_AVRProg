@@ -33,7 +33,7 @@ typedef struct image {
                        ///< datasheet!
 #if defined(__SAMD21G18A__) || defined(__SAMD21E18A__) ||                      \
     defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32) ||              \
-  defined(__SAMD51__) || defined(ARDUINO_ARCH_RP2040)
+    defined(__SAMD51__) || defined(ARDUINO_ARCH_RP2040)
   byte image_hexcode[80000]; ///< Max buffer for intel hex format image (text)
 #else
   byte image_hexcode[10000]; ///< Max buffer for intel hex format image (text)
