@@ -772,7 +772,8 @@ bool Adafruit_AVRProg::verifyImage(const byte *hextext) {
         Serial.print(":0x");
         Serial.print(b, HEX);
         Serial.print(", ");
-        if (lineaddr % 16 == 0) Serial.println();
+        if (lineaddr % 16 == 0)
+          Serial.println();
 
 #endif
 
